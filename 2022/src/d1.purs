@@ -12,19 +12,39 @@ import Effect.Console (log)
 -- Facts:
 -- * The amount of food that one elf carries is separated by newlines before and after the list of amounts
 
+--newtype Food = Food (Array Calories)
+--newtype Calories = Calories Int
+--newtype Elf = Elf (Array Food)
+--newtype Elves = Elves (Array Elf)
+
+-- TODO
+-- * Add stricter typing with newtypes? If added, create methods to convert to primitives
 type Calories = Int
 type Food = Array Calories
+type Elf = Array Food
+type Elves = Array Elf
+
+-- Generic
 
 -- TODO: Split string by delim
 splitStr :: String -> String -> Array String
 splitStr str delim = [ str ]
 
--- TODO: Split the string and read the string input into numbers
-readInput :: String -> Array Int
-readInput s = [1]
+-- Specific
 
-sumCalories :: Array Int -> Int
-sumCalories cals = sum cals
+-- TODO: Split the string and read the string input into numbers
+readFood :: String -> Food
+readFood s = [1]
+--readFood s = [(Calories 1)]
+--readFood s = (Food [(Calories 1)])
+
+--sumCalories :: Array Calories -> Array Int -> Calories
+--sumCalories cals = cals
+
+-- Sums all the calories in a food
+sumFood :: Food -> Calories
+--sumFood food = map sumCalories
+sumFood food = sum food
 
 -- TODO: Read the entire file into the string
 --readFile :: Effect String
