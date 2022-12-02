@@ -12,6 +12,7 @@ You can edit this file as you like.
   , "numbers"
   , "prelude"
   , "strings"
+  , "node-fs-aff"
   , "test-unit"
   ]
 , packages = ./packages.dhall

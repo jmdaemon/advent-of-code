@@ -2,11 +2,17 @@ module D1 where
 
 import Prelude
 
+import Data.String (split)
+import Data.String
+import Data.String.Pattern
 import Data.Foldable (sum)
-import Data.Profunctor.Split (split)
 import Data.String.CodePoints (length)
+
+-- Impure Imports
 import Effect (Effect)
 import Effect.Console (log)
+import Node.Encoding (Encoding(..))
+import Node.FS.Sync (readTextFile)
 
 -- Problem: There are many elves that are carrying food
 -- Facts:
@@ -28,26 +34,20 @@ type Elves = Array Elf
 
 -- TODO: Split string by delim
 splitStr :: String -> String -> Array String
-splitStr str delim = [ str ]
+splitStr str delim = split (Pattern delim) str
 
 -- Specific
 
 -- TODO: Split the string and read the string input into numbers
 readFood :: String -> Food
 readFood s = [1]
---readFood s = [(Calories 1)]
---readFood s = (Food [(Calories 1)])
 
---sumCalories :: Array Calories -> Array Int -> Calories
---sumCalories cals = cals
-
--- Sums all the calories in a food
 sumFood :: Food -> Calories
---sumFood food = map sumCalories
 sumFood food = sum food
 
 -- TODO: Read the entire file into the string
---readFile :: Effect String
+readFile :: String -> Effect String
+readFile file = readTextFile UTF8 file
 
 -- TODO: Split the file string into an array of Strings containing the calories string for each elf
 
@@ -55,6 +55,10 @@ sumFood food = sum food
 -- TODO: Collect this result, and find the highest one
 -- Note that we might need to also remember which elf it was in the list
 
+
 main :: Effect Unit
 main = do
+    let input = readFile "input/d1.txt"
+    --let lines = splitStr input "\n"
     log $ "Advent of Code Day #1"
+
