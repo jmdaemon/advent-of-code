@@ -9,14 +9,16 @@ import Prelude
 import Control.Monad.ST (foreach)
 import Data.Array (fold, foldMap)
 import Data.Foldable (sum)
+import Data.Int (fromString, toStringAs)
 import Data.Maybe (Maybe(..))
+import Data.Number.Format (toStringWith)
 import Data.String (split)
 import Data.String.CodePoints (length)
 import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Console (log)
 import Node.Encoding (Encoding(..))
-import Node.FS.Sync (readTextFile)
+import Node.FS.ASync (readTextFile)
 
 -- Problem: There are many elves that are carrying food
 -- Facts:
@@ -42,6 +44,9 @@ strToInt s = do
     case result of
          Nothing -> 0
          Just int -> int
+
+intToStr :: Int -> String
+intToStr int = toStringAs decimal int
 
 splitStr :: String -> String -> Array String
 splitStr str delim = split (Pattern delim) str
@@ -71,10 +76,6 @@ splitFoods elf = map splitNewLine elf
 toCalories :: InputFoods -> Array Calories
 toCalories food = map strToInt food
 
--- TODO Double map
---splitCalories :: Array InputFoods -> Array InputCalories
---splitCalories foods = fold foods
-
 -- TODO: Split the string and read the string input into numbers
 --readFood :: String -> Food
 --readFood s = 
@@ -86,24 +87,20 @@ sumElf :: Elf -> Food
 sumElf elf = map sumFood elf
 
 fromElvesToCalories :: InputFile -> Array Calories
-fromElvesToCalories conts = do
-    let elves = (splitElves conts)
-    let foods = splitFoods elves
-    map sum (map toCalories foods) -- Returns the array of all the food calories summed
+fromElvesToCalories conts =
+    let elves = splitElves conts
+        foods = splitFoods elves in
+     map sum $ map toCalories foods -- Returns the array of all the food calories summed
+
+findHighestCalories :: String -> Calories
+findHighestCalories conts = highestCalories $ fromElvesToCalories conts
     
 highestCalories :: Array Calories -> Calories
-highestCalories foods = do
-    let highestMaybe = last (sort foods)
+highestCalories foods =
+    let highestMaybe = last $ sort foods in
     case highestMaybe of 
          Nothing -> 0
          Just highest -> highest
-
-    --let sorted = sort calories
-        --fst sorted
-    --let calories = map toCalories foods
-    --let sorted = sort calories
-        --fst sorted
---fromElvesToCalories conts = (map toCalories (map splitFoods (splitElves conts)))
 
 -- TODO: Split the file string into an array of Strings containing the calories string for each elf
 
@@ -111,9 +108,16 @@ highestCalories foods = do
 -- TODO: Collect this result, and find the highest one
 -- Note that we might need to also remember which elf it was in the list
 
-main :: Effect Unit
-main = do
-    let conts = readToString input
-    --let lines = splitStr input "\n"
+test :: Effect Unit
+test = do
+    --let conts = readToString input
+        --highestCals =  conts >>= findHighestCalories
+    --findHighestCalories <- conts
     log $ "Advent of Code Day #1"
+    --log $ "The highest number of calories is " <> intToStr highestCalories
+
+    --log $ "The highest number of calories is " <> intToStr 
+    --conts >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
+
+    readToString input >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
 
