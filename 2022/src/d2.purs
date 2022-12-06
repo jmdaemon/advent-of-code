@@ -22,25 +22,22 @@ calcScoreMatch match_type = case match_type of
     Loss -> 0
 
 type Guide = String
---data Player =  You | Opponent
+data Player =  You Guide | Opponent Guide
 
---class HasHandType a where
-    --getHandType :: a -> ScoreHandType
+class HasHandType a where
+    getHandType :: a -> Maybe ScoreHandType
 
-mapOpponentGuide :: String -> Maybe ScoreHandType
-mapOpponentGuide hand_type = case hand_type of
-    "A" -> Just Rock
-    "B" -> Just Paper
-    "C" -> Just Scissors
-    _ -> Nothing
-
-mapPlayerGuide :: String -> Maybe ScoreHandType
-mapPlayerGuide hand_type = case hand_type of
-    "X" -> Just Rock
-    "Y" -> Just Paper
-    "Z" -> Just Scissors
-    _ -> Nothing
-
+instance getHandTypeYou :: HasHandType Player where
+    getHandType (You guide) = case guide of
+                                  "X" -> Just Rock
+                                  "Y" -> Just Paper
+                                  "Z" -> Just Scissors
+                                  _ -> Nothing
+    getHandType (Opponent guide) = case guide of
+                                        "A" -> Just Rock
+                                        "B" -> Just Paper
+                                        "C" -> Just Scissors
+                                        _ -> Nothing
 
 test :: Effect Unit
 test = do log $ "Advent of Code Day #1"
