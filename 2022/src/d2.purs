@@ -9,14 +9,16 @@ data ScoreHandType = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
 
 calcScoreHandType :: ScoreHandType -> Int
-calcScoreHandType (Rock) = 1
-calcScoreHandType (Paper) = 2
-calcScoreHandType (Scissors) = 3
+calcScoreHandType hand_type = case hand_type of
+    Rock -> 1
+    Paper -> 2
+    Scissors -> 3
 
 calcScoreMatch :: MatchResult -> Int
-calcScoreMatch (Draw) = 3
-calcScoreMatch (Win) = 6
-calcScoreMatch (Loss) = 0
+calcScoreMatch match_type = case match_type of
+    Draw -> 3
+    Win -> 6
+    Loss -> 0
 
 test :: Effect Unit
 test = do log $ "Advent of Code Day #1"
