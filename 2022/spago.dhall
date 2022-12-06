@@ -13,7 +13,6 @@ You can edit this file as you like.
   , "maybe"
   , "node-buffer"
   , "node-fs"
-  , "node-fs-aff"
   , "numbers"
   , "prelude"
   , "st"

@@ -18,7 +18,7 @@ import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Console (log)
 import Node.Encoding (Encoding(..))
-import Node.FS.ASync (readTextFile)
+import Node.FS.Sync (readTextFile)
 
 -- Problem: There are many elves that are carrying food
 -- Facts:
@@ -119,5 +119,5 @@ test = do
     --log $ "The highest number of calories is " <> intToStr 
     --conts >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
 
-    readToString input >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
+    --readToString input >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
 
