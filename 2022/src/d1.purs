@@ -1,5 +1,7 @@
 module D1 where
 
+import Common (readToString)
+
 import Data.Array
 import Data.Int
 import Data.String
@@ -18,7 +20,6 @@ import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Console (log)
 import Node.Encoding (Encoding(..))
-import Node.FS.Sync (readTextFile)
 
 type Elves = Array Elf
 type Elf = Array Food
@@ -56,9 +57,6 @@ splitBlankLine s = splitStr s "\n\n"
 -- Impure
 input :: String
 input = "src/input/d1.txt"
-
-readToString :: String -> Effect String
-readToString file = readTextFile UTF8 file
 
 -- Pure
 splitElves :: InputFile -> InputElves
