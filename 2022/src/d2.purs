@@ -1,5 +1,7 @@
 module D2 where
 
+import Common (readToString, intToStr)
+
 import Prelude
 
 import Data.Int (decimal, toStringAs)
@@ -76,10 +78,19 @@ calcScoreGuideOpponent opp you = score + res
           res = (calcScoreMatch (unwrapPlayer opp) (unwrapPlayer you))
 
 -- TODO: Read the file, collcet all the points, log the final score
+input :: String
+input = "src/input/d2.txt"
+
+-- Read file, split strings on new line, split strings on space,
+-- convert string to hand types, assign and types to opponent, player
 
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
     let opp = Opponent "A"
         you = You "Y"
+    log $ "Test Case"
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuideYou opp you)
+
+    log $ "Input Case"
+    --readToString input >>= \str -> log $ "Total number of points is: " <> intToStr (str)
