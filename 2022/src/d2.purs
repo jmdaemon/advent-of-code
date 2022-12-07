@@ -79,7 +79,7 @@ calcScoreGuideOpponent opp you = score + res
 
 test :: Effect Unit
 test = do
-    log $ "Advent of Code Day #1"
+    log $ "Advent of Code Day #2"
     let opp = Opponent "A"
         you = You "Y"
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuideYou opp you)
