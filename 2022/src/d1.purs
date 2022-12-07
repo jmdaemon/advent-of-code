@@ -20,12 +20,6 @@ import Effect.Console (log)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (readTextFile)
 
--- Problem: There are many elves that are carrying food
--- Facts:
--- * The amount of food that one elf carries is separated by newlines before and after the list of amounts
-
--- * Add stricter typing with newtypes? If added, create methods to convert to primitives
-
 type Elves = Array Elf
 type Elf = Array Food
 type Food = Array Calories
@@ -76,10 +70,6 @@ splitFoods elf = map splitNewLine elf
 toCalories :: InputFoods -> Array Calories
 toCalories food = map strToInt food
 
--- TODO: Split the string and read the string input into numbers
---readFood :: String -> Food
---readFood s = 
-
 sumFood :: Food -> Calories
 sumFood food = sum food
 
@@ -101,12 +91,6 @@ highestCalories foods =
     case highestMaybe of 
          Nothing -> 0
          Just highest -> highest
-
--- TODO: Split the file string into an array of Strings containing the calories string for each elf
-
--- TODO: readFile -> map splitElf -> map readInput -> map sumCalories
--- TODO: Collect this result, and find the highest one
--- Note that we might need to also remember which elf it was in the list
 
 test :: Effect Unit
 test = do
