@@ -1,6 +1,6 @@
 module D1 where
 
-import Common (readToString, intToStr)
+import Common (readToString, intToStr, strToInt, splitBlankLine, splitNewLine)
 
 import Data.Array
 import Data.Int
@@ -14,7 +14,6 @@ import Data.Foldable (sum)
 import Data.Int (fromString, toStringAs)
 import Data.Maybe (Maybe(..))
 import Data.Number.Format (toStringWith)
-import Data.String (split)
 import Data.String.CodePoints (length)
 import Data.Tuple (fst)
 import Effect (Effect)
@@ -33,18 +32,6 @@ type InputElf = Array String
 type InputFoods = Array String
 type InputCalories = String
 
-splitStr :: String -> String -> Array String
-splitStr str delim = split (Pattern delim) str
-    
-splitNewLine :: String -> Array String
-splitNewLine s = splitStr s "\n"
-
-splitBlankLine :: String -> Array String
-splitBlankLine s = splitStr s "\n\n"
-
--- Problem specific
-
--- Impure
 input :: String
 input = "src/input/d1.txt"
 
