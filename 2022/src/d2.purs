@@ -64,7 +64,7 @@ calcScoreMatch Rock Scissors = calcScoreMatchOutcome Win
 calcScoreMatch Scissors Paper = calcScoreMatchOutcome Win
 calcScoreMatch Paper Rock = calcScoreMatchOutcome Win
 
--- CalcScoreGuideYou
+-- CalcScoreGuide
 calcScoreGuideYou :: Player -> Player -> Int
 calcScoreGuideYou opp you = score + res
     where score = (calcScorePlayer you)
@@ -75,21 +75,7 @@ calcScoreGuideOpponent opp you = score + res
     where score = (calcScorePlayer opp)
           res = (calcScoreMatch (unwrapPlayer opp) (unwrapPlayer you))
 
-
---calcScoreGuide :: Player -> Player -> Int
---calcScoreGuide opp you = h1 + h2 + res
-    ----where h1 = (calcScorePlayer opp)
-    --where h2 = (calcScorePlayer you)
-          --res = (calcScoreMatch (unwrapPlayer you) (unwrapPlayer opp))
-
---calcScoreGuide :: ∀ a b. Player a -> Player b -> Int
---calcScoreGuide (Opponent opp) (You you) = do
-    --opphand <- getHandType opp
-    --youhand <- getHandType you
-    
-    --(opphand >>= calcScoreHandType ) + (calcScoreHandType youhand)
-
---calcScoreGuide _ _ = 0
+-- TODO: Read the file, collcet all the points, log the final score
 
 test :: Effect Unit
 test = do
