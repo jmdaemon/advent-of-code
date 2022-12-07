@@ -113,11 +113,17 @@ test = do
     --let conts = readToString input
         --highestCals =  conts >>= findHighestCalories
     --findHighestCalories <- conts
+    let e1 = "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000"
     log $ "Advent of Code Day #1"
+    log $ "Test Case"
+    log $ "The elf with the highest number of calories carried is: Expect 24000 Actual " <> intToStr (findHighestCalories e1)
+
+    log $ "Input Case"
     --log $ "The highest number of calories is " <> intToStr highestCalories
 
     --log $ "The highest number of calories is " <> intToStr 
     --conts >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
 
     --readToString input >>= \s -> log $ "The highest number of calories is " <> intToStr (findHighestCalories s)
+    --log $ "The highest number of calories is " <> intToStr (findHighestCalories e1)
 

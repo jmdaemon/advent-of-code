@@ -9,6 +9,6 @@ import D3 as D3
 
 main :: Effect Unit
 main =
-    --D1.test
+    D1.test
     --D2.test
-    D3.test
+    --D3.test
