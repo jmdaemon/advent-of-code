@@ -1,6 +1,6 @@
 module D1 where
 
-import Common (readToString)
+import Common (readToString, intToStr)
 
 import Data.Array
 import Data.Int
@@ -32,16 +32,6 @@ type InputElves = Array String
 type InputElf = Array String
 type InputFoods = Array String
 type InputCalories = String
-
-strToInt :: String -> Int
-strToInt s = do
-    let result = fromString s
-    case result of
-         Nothing -> 0
-         Just int -> int
-
-intToStr :: Int -> String
-intToStr int = toStringAs decimal int
 
 splitStr :: String -> String -> Array String
 splitStr str delim = split (Pattern delim) str
