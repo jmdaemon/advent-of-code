@@ -10,12 +10,13 @@ import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Console (log)
 
+type Guide = String
 data Hand = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
+data Player = You Guide | Opponent Guide
 
--- Calculating score
-calcHand :: Hand -> Int
-calcHand hand_type = case hand_type of
+calcScoreHand :: Hand -> Int
+calcScoreHand hand_type = case hand_type of
     Rock -> 1
     Paper -> 2
     Scissors -> 3
@@ -26,8 +27,6 @@ calcScoreMatchOutcome match_type = case match_type of
     Win -> 6
     Loss -> 0
 
-type Guide = String
-data Player = You Guide | Opponent Guide
 
 class HasHandType a where
     getHandType :: a -> Maybe Hand
@@ -51,7 +50,7 @@ unwrapPlayer p = case getHandType p of
 
 calcScorePlayer :: Player -> Int
 calcScorePlayer p = case getHandType p of
-    Just guide -> calcHand guide
+    Just guide -> calcScoreHand guide
     Nothing -> 0
 
 -- Let p1: You, p2: Opponent
