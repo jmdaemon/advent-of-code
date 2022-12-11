@@ -15,7 +15,7 @@ input :: String
 input = "src/input/d1.txt"
 
 toCalories :: Array String -> Array Calories
-toCalories foods = map strToInt foods
+toCalories = map strToInt
 
 calsPerElf :: String -> Array Calories
 calsPerElf conts = splitBlankLine conts # map splitNewLine # map toCalories # map sum
