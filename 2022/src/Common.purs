@@ -31,6 +31,9 @@ splitNewLine s = splitStr s "\n"
 splitBlankLine :: String -> Array String
 splitBlankLine s = splitStr s "\n\n"
 
+splitWhitespace :: String -> Array String
+splitWhitespace s = splitStr s " "
+
 -- Reading Strings
 readToString :: String -> Effect String
 readToString file = readTextFile UTF8 file

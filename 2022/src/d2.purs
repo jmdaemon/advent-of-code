@@ -1,11 +1,12 @@
 module D2 where
 
-import Common (readToString, intToStr)
-
 import Prelude
 
+import Common (intToStr, readToString, splitNewLine, splitWhitespace)
+import Data.Array (head, last)
 import Data.Int (decimal, toStringAs)
 import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Console (log)
 
@@ -83,6 +84,61 @@ input = "src/input/d2.txt"
 
 -- Read file, split strings on new line, split strings on space,
 -- convert string to hand types, assign and types to opponent, player
+
+splitGuide :: String -> Array String
+splitGuide s = splitNewLine s
+
+splitHandTypes :: String -> Array String
+splitHandTypes s = splitWhitespace s
+
+-- Contents -> Guides -> Hand Strings -> Hand Type -> Opponent, Player -> Score
+-- String ->  Array String -> Array (Array String)
+
+parseHandTypes :: String -> Array (Array String)
+parseHandTypes conts = map splitHandTypes (splitGuide conts)
+
+bind2 f m n = do
+     m' <- m
+     n' <- n
+     f m' n'
+
+makeTuple :: String -> String -> (Tuple Player Player)
+makeTuple a b = Tuple (Opponent a) (You b)
+
+-- Converts the hand type
+--strHandToType :: Array String -> Tuple ScoreHandType ScoreHandType
+--strHandToType :: Array String -> Tuple Player Player
+--strHandToType hands = 
+    --let x = (head hands)
+        --y = (last hands)
+     --in bind2 makeTuple x y
+
+
+    --let x = (head hands)
+        --y = (last hands) ado
+        --do
+        --x' <- (head hands)
+        --y' <- (last hands)
+        --pure $ makeTuple x' y'
+
+        --let x = (head hands)
+            --y = (last hands)
+
+        --x' <- x
+        --y' <- y
+     --in
+        --pure $ (Tuple x' y')
+        --((head hands) (last hands)) >>= \x y -> Tuple x y
+        --(x' y') >>= \x -> (\y -> Tuple x y)
+        --(x' y') >>= \x -> (\y -> Tuple x y)
+        --bind2 (\x -> (\y -> Tuple x y)) x' y'
+        --bind2 (x y (\y -> Tuple x y)) x' y'
+        --makeTuple x' y'
+        --bind2 makeTuple x' y'
+
+--calcTotalScore :: Array String -> Int
+--calcTotalScore conts = map splitHandTypes (splitGuide conts)
+--calcTotalScore hands = head hands 
 
 test :: Effect Unit
 test = do
