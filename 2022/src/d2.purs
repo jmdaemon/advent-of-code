@@ -27,33 +27,20 @@ calcScoreMatchOutcome match_type = case match_type of
     Win -> 6
     Loss -> 0
 
-
 class HasHandType a where
-    getHandType :: a -> Maybe Hand
+    getHandType :: a -> Hand
 
 instance getHandTypeYou :: HasHandType Player where
     getHandType (You guide) = case guide of
-                                  "X" -> Just Rock
-                                  "Y" -> Just Paper
-                                  "Z" -> Just Scissors
-                                  _ -> Nothing
+                                  "X" -> Rock
+                                  "Y" -> Paper
+                                  _ -> Scissors -- Z
     getHandType (Opponent guide) = case guide of
-                                        "A" -> Just Rock
-                                        "B" -> Just Paper
-                                        "C" -> Just Scissors
-                                        _ -> Nothing
+                                        "A" -> Rock
+                                        "B" -> Paper
+                                        _ -> Scissors -- C
 
-unwrapPlayer :: Player -> Hand
-unwrapPlayer p = case getHandType p of
-    Just guide -> guide
-    Nothing -> Paper
-
-calcScorePlayer :: Player -> Int
-calcScorePlayer p = case getHandType p of
-    Just guide -> calcScoreHand guide
-    Nothing -> 0
-
--- Let p1: You, p2: Opponent
+-- playMatch p1 p2: You p1, Opponent p2
 playMatch :: Hand -> Hand -> MatchResult
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
@@ -63,19 +50,12 @@ playMatch Rock Paper = Loss
 playMatch Paper Scissors = Loss
 playMatch Scissors Rock = Loss
 
-playMatch Rock Scissors = Win
-playMatch Scissors Paper = Win
-playMatch Paper Rock = Win
+playMatch _ _ = Win
 
 calcScoreGuideYou :: Player -> Player -> Int
 calcScoreGuideYou opp you = score + res
-    where score = (calcScorePlayer you)
-          res = calcScoreMatchOutcome $ playMatch (unwrapPlayer opp) (unwrapPlayer you)
-
---calcScoreGuideOpponent :: Player -> Player -> Int
---calcScoreGuideOpponent opp you = score + res
-    --where score = (calcScorePlayer opp)
-          --res = (calcScoreMatch (unwrapPlayer opp) (unwrapPlayer you))
+    where score = getHandType you # calcScoreHand
+          res = calcScoreMatchOutcome (playMatch (getHandType you) (getHandType opp))
 
 -- TODO: Read the file, collcet all the points, log the final score
 input :: String
@@ -95,11 +75,6 @@ splitHandTypes s = splitWhitespace s
 
 parseHandTypes :: String -> Array (Array String)
 parseHandTypes conts = map splitHandTypes (splitGuide conts)
-
-bind2 f m n = do
-     m' <- m
-     n' <- n
-     f m' n'
 
 makeTuple :: String -> String -> (Tuple Player Player)
 makeTuple a b = Tuple (Opponent a) (You b)
@@ -146,6 +121,5 @@ test = do
         you = You "Y"
     log $ "Test Case"
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuideYou opp you)
-
     log $ "Input Case"
     --readToString input >>= \str -> log $ "Total number of points is: " <> intToStr (str)
