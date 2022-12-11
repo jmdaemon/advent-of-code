@@ -13,6 +13,7 @@ import Effect.Console (log)
 data ScoreHandType = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
 
+-- Calculating score
 calcScoreHandType :: ScoreHandType -> Int
 calcScoreHandType hand_type = case hand_type of
     Rock -> 1
@@ -54,29 +55,29 @@ calcScorePlayer p = case getHandType p of
     Nothing -> 0
 
 -- Let p1: You, p2: Opponent
-calcScoreMatch :: ScoreHandType -> ScoreHandType -> Int
-calcScoreMatch Rock Rock = calcScoreMatchOutcome Draw
-calcScoreMatch Paper Paper = calcScoreMatchOutcome Draw
-calcScoreMatch Scissors Scissors = calcScoreMatchOutcome Draw
+playMatch :: ScoreHandType -> ScoreHandType -> MatchResult
+playMatch Rock Rock = Draw
+playMatch Paper Paper = Draw
+playMatch Scissors Scissors = Draw
 
-calcScoreMatch Rock Paper = calcScoreMatchOutcome Loss
-calcScoreMatch Paper Scissors = calcScoreMatchOutcome Loss
-calcScoreMatch Scissors Rock = calcScoreMatchOutcome Loss
+playMatch Rock Paper = Loss
+playMatch Paper Scissors = Loss
+playMatch Scissors Rock = Loss
 
-calcScoreMatch Rock Scissors = calcScoreMatchOutcome Win
-calcScoreMatch Scissors Paper = calcScoreMatchOutcome Win
-calcScoreMatch Paper Rock = calcScoreMatchOutcome Win
+playMatch Rock Scissors = Win
+playMatch Scissors Paper = Win
+playMatch Paper Rock = Win
 
 -- CalcScoreGuide
 calcScoreGuideYou :: Player -> Player -> Int
 calcScoreGuideYou opp you = score + res
     where score = (calcScorePlayer you)
-          res = (calcScoreMatch (unwrapPlayer you) (unwrapPlayer opp))
+          res = (calcScoreMatchOutcome (playMatch (unwrapPlayer you) (unwrapPlayer opp)))
 
-calcScoreGuideOpponent :: Player -> Player -> Int
-calcScoreGuideOpponent opp you = score + res
-    where score = (calcScorePlayer opp)
-          res = (calcScoreMatch (unwrapPlayer opp) (unwrapPlayer you))
+--calcScoreGuideOpponent :: Player -> Player -> Int
+--calcScoreGuideOpponent opp you = score + res
+    --where score = (calcScorePlayer opp)
+          --res = (calcScoreMatch (unwrapPlayer opp) (unwrapPlayer you))
 
 -- TODO: Read the file, collcet all the points, log the final score
 input :: String
