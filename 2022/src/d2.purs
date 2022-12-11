@@ -10,12 +10,12 @@ import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Console (log)
 
-data ScoreHandType = Rock | Paper | Scissors
+data Hand = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
 
 -- Calculating score
-calcScoreHandType :: ScoreHandType -> Int
-calcScoreHandType hand_type = case hand_type of
+calcHand :: Hand -> Int
+calcHand hand_type = case hand_type of
     Rock -> 1
     Paper -> 2
     Scissors -> 3
@@ -27,10 +27,10 @@ calcScoreMatchOutcome match_type = case match_type of
     Loss -> 0
 
 type Guide = String
-data Player =  You Guide | Opponent Guide
+data Player = You Guide | Opponent Guide
 
 class HasHandType a where
-    getHandType :: a -> Maybe ScoreHandType
+    getHandType :: a -> Maybe Hand
 
 instance getHandTypeYou :: HasHandType Player where
     getHandType (You guide) = case guide of
@@ -44,18 +44,18 @@ instance getHandTypeYou :: HasHandType Player where
                                         "C" -> Just Scissors
                                         _ -> Nothing
 
-unwrapPlayer :: Player -> ScoreHandType
+unwrapPlayer :: Player -> Hand
 unwrapPlayer p = case getHandType p of
     Just guide -> guide
     Nothing -> Paper
 
 calcScorePlayer :: Player -> Int
 calcScorePlayer p = case getHandType p of
-    Just guide -> calcScoreHandType guide
+    Just guide -> calcHand guide
     Nothing -> 0
 
 -- Let p1: You, p2: Opponent
-playMatch :: ScoreHandType -> ScoreHandType -> MatchResult
+playMatch :: Hand -> Hand -> MatchResult
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
 playMatch Scissors Scissors = Draw
@@ -68,11 +68,10 @@ playMatch Rock Scissors = Win
 playMatch Scissors Paper = Win
 playMatch Paper Rock = Win
 
--- CalcScoreGuide
 calcScoreGuideYou :: Player -> Player -> Int
 calcScoreGuideYou opp you = score + res
     where score = (calcScorePlayer you)
-          res = (calcScoreMatchOutcome (playMatch (unwrapPlayer you) (unwrapPlayer opp)))
+          res = calcScoreMatchOutcome $ playMatch (unwrapPlayer opp) (unwrapPlayer you)
 
 --calcScoreGuideOpponent :: Player -> Player -> Int
 --calcScoreGuideOpponent opp you = score + res
@@ -107,7 +106,7 @@ makeTuple :: String -> String -> (Tuple Player Player)
 makeTuple a b = Tuple (Opponent a) (You b)
 
 -- Converts the hand type
---strHandToType :: Array String -> Tuple ScoreHandType ScoreHandType
+--strHandToType :: Array String -> Tuple Hand Hand
 --strHandToType :: Array String -> Tuple Player Player
 --strHandToType hands = 
     --let x = (head hands)
