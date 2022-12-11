@@ -1,71 +1,30 @@
 module D1 where
 
-import Common (readToString, intToStr, strToInt, splitBlankLine, splitNewLine)
-
-import Data.Array
-import Data.Int
-import Data.String
-import Data.String.Pattern
 import Prelude
 
-import Control.Monad.ST (foreach)
-import Data.Array (fold, foldMap)
+import Common (readToString, intToStr, strToInt, splitBlankLine, splitNewLine)
+import Data.Array (last, sort)
 import Data.Foldable (sum)
-import Data.Int (fromString, toStringAs)
 import Data.Maybe (Maybe(..))
-import Data.Number.Format (toStringWith)
-import Data.String.CodePoints (length)
-import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Console (log)
-import Node.Encoding (Encoding(..))
 
-type Elves = Array Elf
-type Elf = Array Food
-type Food = Array Calories
 type Calories = Int
-
--- InputFile -> InputElfCalories -> InputCalories -> Calories -> Calory -> Array Calory
-type InputFile = String
-type InputElves = Array String
-type InputElf = Array String
-type InputFoods = Array String
-type InputCalories = String
 
 input :: String
 input = "src/input/d1.txt"
 
--- Pure
-splitElves :: InputFile -> InputElves
-splitElves conts = splitBlankLine conts
+toCalories :: Array String -> Array Calories
+toCalories foods = map strToInt foods
 
-splitFoods :: InputElf -> Array InputFoods
-splitFoods elf = map splitNewLine elf
-
-toCalories :: InputFoods -> Array Calories
-toCalories food = map strToInt food
-
-sumFood :: Food -> Calories
-sumFood food = sum food
-
-sumElf :: Elf -> Food
-sumElf elf = map sumFood elf
-
-fromElvesToCalories :: InputFile -> Array Calories
-fromElvesToCalories conts =
-    let elves = splitElves conts
-        foods = splitFoods elves in
-     map sum $ map toCalories foods -- Returns the array of all the food calories summed
+calsPerElf :: String -> Array Calories
+calsPerElf conts = splitBlankLine conts # map splitNewLine # map toCalories # map sum
 
 findHighestCalories :: String -> Calories
-findHighestCalories conts = highestCalories $ fromElvesToCalories conts
-    
-highestCalories :: Array Calories -> Calories
-highestCalories foods =
-    let highestMaybe = last $ sort foods in
-    case highestMaybe of 
+findHighestCalories conts = let highest = calsPerElf conts # sort # last in
+    case highest of 
          Nothing -> 0
-         Just highest -> highest
+         Just cals -> cals
 
 test :: Effect Unit
 test = do
@@ -73,6 +32,5 @@ test = do
     log $ "Advent of Code Day #1"
     log $ "Test Case"
     log $ "The elf with the highest number of calories carried is: Expect 24000 Actual " <> intToStr (findHighestCalories e1)
-
     log $ "Input Case"
     readToString input >>= \str -> log $ "The highest number of calories is " <> intToStr (findHighestCalories str)
