@@ -14,6 +14,7 @@ You can edit this file as you like.
   , "node-buffer"
   , "node-fs"
   , "numbers"
+  , "partial"
   , "prelude"
   , "st"
   , "strings"
