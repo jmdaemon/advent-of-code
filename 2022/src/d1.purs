@@ -31,9 +31,7 @@ findHighestCalories conts = let highest = calsPerElf conts # sort # last in
 findTopThreeCalories :: String -> Calories
 findTopThreeCalories conts = total where
     highest = calsPerElf conts # sort
-    len = length highest
-    beg = len - 3
-    top_three = (splitAt beg highest).after
+    top_three = (splitAt (length highest - 3) highest).after
     total = sum top_three
 
 test :: Effect Unit
