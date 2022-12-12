@@ -107,19 +107,7 @@ findTotalScoreGuide conts = total where
     players = map toPlayersGuide hands
     scores = map (\p ->
                let opp = fst p in
-                   calcScoreGuide opp $ You $ findHand (getHand opp) (snd p)
-
-               --let p1 = fst p
-                   --mr = snd p
-                   --hand = findHand p1 mr
-                   --opp = (Opponent p1)
-                   --you = (You hand)
-
-                --in calcScoreGuide (fst p) you
-                --in calcScoreGuide opp you
-                --in calcScoreGuide (Opponent p1) you
-                   --calcScoreGuide (fst p) (snd p)
-               ) players
+                   calcScoreGuide opp $ You $ findHand (getHand opp) (snd p)) players
     total = sum scores
 
 test :: Effect Unit
@@ -132,5 +120,5 @@ test = do
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuide opp you)
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
-    log $ "Part I"
+    log $ "Part II"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 
