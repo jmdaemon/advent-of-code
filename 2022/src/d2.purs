@@ -101,6 +101,10 @@ findHand Scissors Win  = Paper
 toPlayersGuide :: Array String -> Tuple Player MatchResult
 toPlayersGuide array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
 
+calcScoreGuideII :: Player -> MatchResult -> Int
+--calcScoreGuideII p1 mr = calcScoreGuide opp $ You $ findHand (getHand opp) (snd p)
+calcScoreGuideII opp mr = calcScoreGuide opp $ You $ findHand (getHand opp) mr
+
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = total where
     hands = splitNewLine conts # map splitWhitespace
@@ -120,5 +124,11 @@ test = do
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuide opp you)
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
-    log $ "Part II"
+
+    log $ "\nPart II"
+    log $ "Test Case"
+    let p1 = Opponent Rock
+        mr = Draw
+    log $ "Score Expect 4: Actual " <> toStringAs decimal (calcScoreGuideII p1 mr)
+    log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 
