@@ -37,8 +37,8 @@ scoreHand hand_type = case hand_type of
     Paper -> 2
     Scissors -> 3
 
-calcScoreMatchOutcome :: MatchResult -> Int
-calcScoreMatchOutcome match_type = case match_type of
+scoreMatch :: MatchResult -> Int
+scoreMatch match_type = case match_type of
     Loss -> 0
     Draw -> 3
     Win -> 6
@@ -60,7 +60,7 @@ playMatch Scissors Paper = Win
 
 -- calcScore [you opp] -> Your score | calcScore [opp you] -> Your opponent's score
 calcScore :: Hand -> Hand -> Int
-calcScore h1 h2 = (scoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
+calcScore h1 h2 = (scoreHand h1) + (scoreMatch $ playMatch h1 h2)
 
 calcScoreGuide :: Player -> Player -> Int
 calcScoreGuide (Opponent _) (Opponent _) = 0
