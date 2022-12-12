@@ -19,17 +19,17 @@ getHand :: Player -> Hand
 getHand (You h) = h
 getHand (Opponent h) = h
 
-mkYou :: String -> Player
-mkYou s = case s of
-    "X" -> You Rock
-    "Y" -> You Paper
-    _ -> You Scissors
+mkHandYou :: String -> Hand
+mkHandYou s = case s of
+    "X" -> Rock
+    "Y" -> Paper
+    _ -> Scissors
 
-mkOpp :: String -> Player
-mkOpp s = case s of
-    "A" -> Opponent Rock
-    "B" -> Opponent Paper
-    _ -> Opponent Scissors
+mkHandOpp :: String -> Hand
+mkHandOpp s = case s of
+    "A" -> Rock
+    "B" -> Paper
+    _ -> Scissors
 
 scoreHand :: Hand -> Int
 scoreHand hand_type = case hand_type of
@@ -69,7 +69,7 @@ calcScoreGuide (Opponent opp) (You you) = calcScore you opp
 calcScoreGuide (You you) (Opponent opp) = calcScore opp you
 
 toPlayers :: Array String -> Tuple Player Player
-toPlayers array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkYou $ unsafePartial $ unsafeIndex array 1)
+toPlayers array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (You $ mkHandYou $ unsafePartial $ unsafeIndex array 1)
 
 findTotalScore :: String -> Int
 findTotalScore conts = total where
@@ -100,7 +100,7 @@ findHand Paper Win = Scissors
 findHand Scissors Win = Rock
 
 toPlayersGuide :: Array String -> Tuple Player MatchResult
-toPlayersGuide array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
+toPlayersGuide array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
 
 calcScoreGuideII :: Player -> MatchResult -> Int
 calcScoreGuideII opp mr = calcScoreGuide opp $ You $ findHand (getHand opp) mr
