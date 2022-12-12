@@ -3,7 +3,7 @@ module D2 where
 import Prelude
 
 import Common (intToStr, readToString, splitNewLine, splitWhitespace)
-import Data.Array (index)
+import Data.Array (head, last)
 import Data.Foldable (sum)
 import Data.Int (decimal, toStringAs)
 import Data.Maybe (Maybe(..))
@@ -70,15 +70,12 @@ calcScoreGuide (You you) (Opponent opp) = calcScore (Opponent opp) (You you)
 input :: String
 input = "src/input/d2.txt"
 
-makeTuple :: String -> String -> (Tuple Player Player)
-makeTuple a b = Tuple (Opponent a) (You b)
-
+-- TODO: Can replace with unsafe head/last and refactor code
 toPlayers :: Array String -> Maybe (Tuple Player Player)
-toPlayers array = case (index array 0), (index array 1) of
-    p1, p2 -> do
-       p1' <- p1
-       p2' <- p2
-       pure $ Tuple (Opponent p1') (You p2')
+toPlayers array = do
+    p1 <- head array
+    p2 <- last array
+    pure $ Tuple (Opponent p1) (You p2)
 
 unwrapPlayers :: Maybe (Tuple Player Player) -> Tuple Player Player
 unwrapPlayers tuple = case tuple of
@@ -86,7 +83,7 @@ unwrapPlayers tuple = case tuple of
     Just pair -> pair
 
 findTotalScore :: String -> Int
-findTotalScore conts = res where
+findTotalScore conts = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map toPlayers hands
     scores = map (\x ->
@@ -94,7 +91,7 @@ findTotalScore conts = res where
                    opp = fst _players
                    you = snd _players
                    in calcScoreGuide opp you) players
-    res = sum scores
+    total = sum scores
 
 test :: Effect Unit
 test = do
