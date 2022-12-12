@@ -32,17 +32,17 @@ mkOpp s = case s of
     "B" -> Opponent Paper
     _ -> Opponent Scissors
 
-calcScoreHand :: Hand -> Int
-calcScoreHand hand_type = case hand_type of
+scoreHand :: Hand -> Int
+scoreHand hand_type = case hand_type of
     Rock -> 1
     Paper -> 2
     Scissors -> 3
 
 calcScoreMatchOutcome :: MatchResult -> Int
 calcScoreMatchOutcome match_type = case match_type of
+    Loss -> 0
     Draw -> 3
     Win -> 6
-    Loss -> 0
 
 -- playMatch p1 p2: You p1, Opponent p2
 playMatch :: Hand -> Hand -> MatchResult
@@ -50,15 +50,23 @@ playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
 playMatch Scissors Scissors = Draw
 
-playMatch Rock Paper = Loss
-playMatch Paper Scissors = Loss
-playMatch Scissors Rock = Loss
+playMatch Rock Scissors = Win
+playMatch Paper Rock = Win
+playMatch Scissors Paper = Win
 
-playMatch _ _ = Win
+--playMatch Rock Paper = Loss
+--playMatch Paper Scissors = Loss
+--playMatch Scissors Rock = Loss
+playMatch _ _ = Loss
+
+--playMatch _ _ = Win
+--playMatch Rock Scissors = Win
+--playMatch Paper Rock = Win
+--playMatch Scissors Paper = Win
 
 -- calcScore [you opp] -> Your score, calcScore [opp you] -> Your opponent's score
 calcScore :: Hand -> Hand -> Int
-calcScore h1 h2 = (calcScoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
+calcScore h1 h2 = (scoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
 
 calcScoreGuide :: Player -> Player -> Int
 calcScoreGuide (Opponent _) (Opponent _) = 0
