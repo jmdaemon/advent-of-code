@@ -11,7 +11,7 @@ import Data.Array.NonEmpty (NonEmptyArray, fromArray, toNonEmpty)
 import Data.Array.NonEmpty as DANE
 import Data.Char.Utils (toCodePoint)
 import Data.Eq ((/=))
-import Data.Map (Map, lookup)
+import Data.Map (Map, lookup, union)
 import Data.Map as DM
 import Data.Maybe (Maybe(..))
 import Data.Set (Set, fromFoldable, fromMap, insert, intersection, singleton, toUnfoldable)
@@ -49,18 +49,25 @@ setToStr set = DA.fromFoldable set # fromCharArray
 findMatching :: String -> String -> String
 findMatching s1 s2 = intersection (strToSet s1) (strToSet s2) # setToStr 
 
--- Create Mappings
---mkLowerMap :: Map Char String
+-- Helper functions to create mappings
 mkCharMap :: String -> Array Int -> Map Char Int
 mkCharMap charset num_range = DM.fromFoldable $ zip (toCharArray charset) num_range
 
 mkLowerMap :: Map Char Int
---mkLowerMap = DM.fromFoldable $ zip (toCharArray "abcdefghijklmnopqrstuvwxyz") (range 1 26) 
 mkLowerMap = mkCharMap "abcdefghijklmnopqrstuvwxyz" (range 1 26)
 
 mkUpperMap :: Map Char Int
---mkUpperMap = DM.fromFoldable $ zip (toCharArray "abcdefghijklmnopqrstuvwxyz") (range 1 26) 
 mkUpperMap = mkCharMap (toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52) 
+
+-- Mappings themselves
+lmap :: Map Char Int
+lmap = mkLowerMap
+
+umap :: Map Char Int
+umap = mkUpperMap
+
+cmap :: Map Char Int
+cmap = union lmap umap
 
 -- TOOD: Find a way to map the characters easily from lowercase 1-26, uppercase 27-52
 -- Idea: Generate the lowercase, uppercase mappings?
@@ -128,8 +135,9 @@ test = do
 
     --log $ "Code Points: " <> intToStr (toPriorities (findMatching s1 s2) - 96)
     --log $ "Code Points: " <> intToStr (toPriorities ("P"))
-    let lmap = mkLowerMap
-        umap = mkUpperMap
+
     --log $ "Priority: " <> intToStr (lookup (findMatching s1 s2) lmap)
     let matching = (findMatching s1 s2)
-    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities matching lmap))))
+    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities matching cmap))))
+
+    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities "P" cmap))))
