@@ -97,14 +97,14 @@ findHand Scissors Win = Rock
 toPlayersGuide :: Array String -> Tuple Player MatchResult
 toPlayersGuide array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
 
-calcScoreGuideII :: Player -> MatchResult -> Int
-calcScoreGuideII opp mr = calcScorePlayer opp $ You $ findHand (getHand opp) mr
+calcScoreGuide :: Player -> MatchResult -> Int
+calcScoreGuide opp mr = calcScorePlayer opp $ You $ findHand (getHand opp) mr
 
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map toPlayersGuide hands
-    scores = map (\p -> calcScoreGuideII (fst p) (snd p)) players
+    scores = map (\p -> calcScoreGuide (fst p) (snd p)) players
     total = sum scores
 
 testI :: Player -> Player -> String -> String -> Effect Unit
@@ -115,7 +115,7 @@ testI opp you title msg = do
 testII :: Player -> MatchResult -> String -> String -> Effect Unit
 testII opp mr title msg = do
     log $ title
-    log $ msg <> toStringAs decimal (calcScoreGuideII opp mr)
+    log $ msg <> toStringAs decimal (calcScoreGuide opp mr)
 
 test :: Effect Unit
 test = do
