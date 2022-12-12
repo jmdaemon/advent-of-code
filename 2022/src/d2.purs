@@ -14,20 +14,23 @@ import Effect.Console (log)
 type Guide = String
 data Hand = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
-data Player = You Guide | Opponent Guide
+data Player = You Hand | Opponent Hand
 
-class HasHand a where
-    getHandType :: a -> Hand
+getHand :: Player -> Hand
+getHand (You h) = h
+getHand (Opponent h) = h
 
-instance getHandTypeYou :: HasHand Player where
-    getHandType (You guide) = case guide of
-                                  "X" -> Rock
-                                  "Y" -> Paper
-                                  _ -> Scissors -- Z
-    getHandType (Opponent guide) = case guide of
-                                        "A" -> Rock
-                                        "B" -> Paper
-                                        _ -> Scissors -- C
+mkYou :: String -> Player
+mkYou s = case s of
+    "X" -> You Rock
+    "Y" -> You Paper
+    _ -> You Scissors
+
+mkOpp :: String -> Player
+mkOpp s = case s of
+    "A" -> Opponent Rock
+    "B" -> Opponent Paper
+    _ -> Opponent Scissors
 
 calcScoreHand :: Hand -> Int
 calcScoreHand hand_type = case hand_type of
@@ -53,19 +56,15 @@ playMatch Scissors Rock = Loss
 
 playMatch _ _ = Win
 
--- Calculates the score for a player
---      calcScore you opp -> Your score
---      calcScore opp you -> Your opponent's score
-calcScore :: Player -> Player -> Int
-calcScore p1 p2 = score + res
-    where score = getHandType p1 # calcScoreHand
-          res = calcScoreMatchOutcome $ playMatch (getHandType p1) (getHandType p2)
+-- calcScore [you opp] -> Your score, calcScore [opp you] -> Your opponent's score
+calcScore :: Hand -> Hand -> Int
+calcScore h1 h2 = (calcScoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
 
 calcScoreGuide :: Player -> Player -> Int
 calcScoreGuide (Opponent _) (Opponent _) = 0
 calcScoreGuide (You _) (You _) = 0
-calcScoreGuide (Opponent opp) (You you) = calcScore (You you) (Opponent opp)
-calcScoreGuide (You you) (Opponent opp) = calcScore (Opponent opp) (You you)
+calcScoreGuide (Opponent opp) (You you) = calcScore you opp
+calcScoreGuide (You you) (Opponent opp) = calcScore opp you
 
 input :: String
 input = "src/input/d2.txt"
@@ -75,30 +74,29 @@ toPlayers :: Array String -> Maybe (Tuple Player Player)
 toPlayers array = do
     p1 <- head array
     p2 <- last array
-    pure $ Tuple (Opponent p1) (You p2)
+    pure $ Tuple (mkOpp p1) (mkYou p2)
 
 unwrapPlayers :: Maybe (Tuple Player Player) -> Tuple Player Player
 unwrapPlayers tuple = case tuple of
-    Nothing -> Tuple (You "X") (You "X")
+    Nothing -> Tuple (You Rock) (You Rock)
     Just pair -> pair
 
 findTotalScore :: String -> Int
 findTotalScore conts = total where
-    hands = splitNewLine conts # map splitWhitespace
-    players = map toPlayers hands
+    hands = (splitNewLine conts # map splitWhitespace)
+    players = map (\h -> toPlayers h # unwrapPlayers) hands
     scores = map (\x ->
-               let _players = unwrapPlayers x
-                   opp = fst _players
-                   you = snd _players
+               let opp = fst x
+                   you = snd x
                    in calcScoreGuide opp you) players
     total = sum scores
 
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
-    let opp = Opponent "A"
-        you = You "Y"
+    let opp = Opponent Rock
+        you = You Paper
     log $ "Test Case"
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuide opp you)
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts)
+    readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
