@@ -72,48 +72,14 @@ calcScoreGuide (You you) (Opponent opp) = calcScore opp you
 input :: String
 input = "src/input/d2.txt"
 
---head :: ∀ a. Semigroup a => NonEmpty Array a -> a
---head (x :| xs) = x
-
---last :: ∀ a. Semigroup a => NonEmpty Array a -> a
---last (x :| a0) = ?whatGoesHere
---last (x :| xs) = sort xs # head
---last x = sort x # head
-
--- TODO: Can replace with unsafe head/last and refactor code
---toPlayers :: Array String -> Maybe (Tuple Player Player)
-
---toPlayers :: NonEmptyArray String -> Tuple Player Player
---toPlayers array = Tuple (mkOpp $ head array) (mkYou $ last array)
-
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkYou $ unsafePartial $ unsafeIndex array 1)
-
---toPlayers array = do
-    --p1 <- head array
-    --p2 <- last array
-    --pure $ NonEmpty Tuple (mkOpp p1) (mkYou p2)
-
---unwrapPlayers :: Maybe (Tuple Player Player) -> Tuple Player Player
---unwrapPlayers tuple = case tuple of
-    --Nothing -> Tuple (You Rock) (You Rock)
-    --Just pair -> pair
-
---toNEAS :: ∀ a. Array a -> NonEmptyArray a
---toNEAS a = case fromArray a of
-    --Nothing -> singleton
-    --Just arr -> arr
 
 findTotalScore :: String -> Int
 findTotalScore conts = total where
     hands = (splitNewLine conts # map splitWhitespace)
-    --players = map (\h -> toPlayers h # unwrapPlayers) hands
-    --players = map toPlayers $ map fromArray hands
     players = map toPlayers hands
-    scores = map (\x ->
-               let opp = fst x
-                   you = snd x
-                   in calcScoreGuide opp you) players
+    scores = map (\x -> calcScoreGuide (fst x) (snd x)) players
     total = sum scores
 
 test :: Effect Unit
