@@ -52,10 +52,19 @@ playMatch Scissors Rock = Loss
 
 playMatch _ _ = Win
 
-calcScoreGuideYou :: Player -> Player -> Int
-calcScoreGuideYou opp you = score + res
-    where score = getHandType you # calcScoreHand
-          res = calcScoreMatchOutcome (playMatch (getHandType you) (getHandType opp))
+calcScore :: Player -> Player -> Int
+calcScore p1 p2 = score + res
+    where score = getHandType p1 # calcScoreHand
+          res = calcScoreMatchOutcome $ playMatch (getHandType p1) (getHandType p2)
+
+-- Calculates the score for either you or the opponent
+-- calcScoreGuideYou opp you -> Returns your score
+-- calcScoreGuideYou you opp -> Returns your opponent's score
+calcScoreGuide :: Player -> Player -> Int
+calcScoreGuide (Opponent _) (Opponent _) = 0
+calcScoreGuide (You _) (You _) = 0
+calcScoreGuide (Opponent opp) (You you) = calcScore (You you) (Opponent opp)
+calcScoreGuide (You you) (Opponent opp) = calcScore (Opponent opp) (You you)
 
 -- TODO: Read the file, collcet all the points, log the final score
 input :: String
@@ -120,6 +129,6 @@ test = do
     let opp = Opponent "A"
         you = You "Y"
     log $ "Test Case"
-    log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuideYou opp you)
+    log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuide opp you)
     log $ "Input Case"
     --readToString input >>= \str -> log $ "Total number of points is: " <> intToStr (str)
