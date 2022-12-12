@@ -6,15 +6,11 @@ import Common (intToStr, readToString, splitNewLine, splitWhitespace)
 import Data.Array (unsafeIndex)
 import Data.Foldable (sum)
 import Data.Int (decimal, toStringAs)
-import Data.List (List(..), (:))
-import Data.Maybe (Maybe(..))
---import Data.NonEmpty (NonEmpty(..), (:|))
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
 import Partial.Unsafe (unsafePartial)
 
-type Guide = String
 data Hand = Rock | Paper | Scissors
 data MatchResult = Win | Draw | Loss
 data Player = You Hand | Opponent Hand
@@ -77,9 +73,53 @@ toPlayers array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkYou $ u
 
 findTotalScore :: String -> Int
 findTotalScore conts = total where
-    hands = (splitNewLine conts # map splitWhitespace)
+    hands = splitNewLine conts # map splitWhitespace
     players = map toPlayers hands
-    scores = map (\x -> calcScoreGuide (fst x) (snd x)) players
+    scores = map (\p -> calcScoreGuide (fst p) (snd p)) players
+    total = sum scores
+
+-- Part II
+mkMatchResult :: String -> MatchResult
+mkMatchResult s = case s of
+    "X" -> Loss
+    "Y" -> Draw
+    _ -> Win
+
+findHand :: Hand -> MatchResult -> Hand
+findHand Rock Draw = Rock
+findHand Paper Draw = Paper
+findHand Scissors Draw = Scissors
+
+findHand Rock Loss = Paper
+findHand Paper Loss = Scissors
+findHand Scissors Loss = Rock
+
+findHand Rock Win = Scissors
+findHand Paper Win = Rock
+findHand Scissors Win  = Paper
+
+toPlayersGuide :: Array String -> Tuple Player MatchResult
+toPlayersGuide array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
+
+findTotalScoreGuide :: String -> Int
+findTotalScoreGuide conts = total where
+    hands = splitNewLine conts # map splitWhitespace
+    players = map toPlayersGuide hands
+    scores = map (\p ->
+               let opp = fst p in
+                   calcScoreGuide opp $ You $ findHand (getHand opp) (snd p)
+
+               --let p1 = fst p
+                   --mr = snd p
+                   --hand = findHand p1 mr
+                   --opp = (Opponent p1)
+                   --you = (You hand)
+
+                --in calcScoreGuide (fst p) you
+                --in calcScoreGuide opp you
+                --in calcScoreGuide (Opponent p1) you
+                   --calcScoreGuide (fst p) (snd p)
+               ) players
     total = sum scores
 
 test :: Effect Unit
@@ -87,7 +127,10 @@ test = do
     log $ "Advent of Code Day #2"
     let opp = Opponent Rock
         you = You Paper
+    log $ "Part I"
     log $ "Test Case"
     log $ "Score Expect 8: Actual " <> toStringAs decimal (calcScoreGuide opp you)
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
+    log $ "Part I"
+    readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 
