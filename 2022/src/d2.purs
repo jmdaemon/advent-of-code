@@ -63,13 +63,10 @@ calcScore :: Hand -> Hand -> Int
 calcScore h1 h2 = (scoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
 
 calcScoreGuide :: Player -> Player -> Int
---calcScoreGuide opp you = calcScore (You you) (Opponent opp)
---calcScoreGuide opp you = calcScore (You opp) (Opponent you)
 calcScoreGuide (Opponent _) (Opponent _) = 0
 calcScoreGuide (You _) (You _) = 0
 calcScoreGuide (Opponent opp) (You you) = calcScore you opp
 calcScoreGuide (You you) (Opponent opp) = calcScore opp you
---calcScoreGuide _ _ = 0
 
 input :: String
 input = "src/input/d2.txt"
@@ -96,15 +93,6 @@ findHand Rock Draw = Rock
 findHand Paper Draw = Paper
 findHand Scissors Draw = Scissors
 
--- Wrong assumption
---findHand Rock Loss = Paper
---findHand Paper Loss = Scissors
---findHand Scissors Loss = Rock
-
---findHand Rock Win = Scissors
---findHand Paper Win = Rock
---findHand Scissors Win = Paper
-
 -- If the opponent has rock, we want to lose with scissors
 findHand Rock Loss = Scissors
 findHand Paper Loss = Rock
@@ -116,83 +104,43 @@ findHand Scissors Win = Rock
 
 toPlayersGuide :: Array String -> Tuple Player MatchResult
 toPlayersGuide array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
---toPlayersGuide array = Tuple (mkOpp <<< unsafePartial $ unsafeIndex array 0) (mkMatchResult <<< unsafePartial $ unsafeIndex array 1)
-
--- calcScore [you opp] -> Your score | calcScore [opp you] -> Your opponent's score
-
-calcScoreUpdated :: Hand -> Hand -> Int
-calcScoreUpdated h1 h2 = (scoreHand h1) + (calcScoreMatchOutcome $ playMatch h1 h2)
-
-calcScoreGuideUpdated :: Player -> Player -> Int
-calcScoreGuideUpdated (Opponent _) (Opponent _) = 0
-calcScoreGuideUpdated (You _) (You _) = 0
-calcScoreGuideUpdated (Opponent opp) (You you) = calcScoreUpdated you opp
-calcScoreGuideUpdated (You you) (Opponent opp) = calcScoreUpdated opp you
 
 calcScoreGuideII :: Player -> MatchResult -> Int
-calcScoreGuideII opp mr = calcScoreGuideUpdated opp $ You $ findHand (getHand opp) mr
-
---calcScoreGuideII :: Player -> MatchResult -> Int
---calcScoreGuideII opp mr = score + res
-    --where
-          --opphand = getHand opp
-          --you = You $ findHand opphand mr
-          --youhand = getHand you
-          --score = scoreHand youhand
-          --res = calcScoreMatchOutcome $ playMatch youhand opphand
-
---calcScoreGuideII opp mr = calcScoreGuideUpdated opp (You ( findHand (getHand opp) mr))
-
---fillYouHand :: Tuple Player MatchResult -> Int
---fillYouHand tup = calcScoreGuideII (fst tup) (snd tup)
+calcScoreGuideII opp mr = calcScoreGuide opp $ You $ findHand (getHand opp) mr
 
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = total where
-    hands = splitNewLine conts # map splitWhitespace -- [ ['A', 'X'] ]
-    players = map toPlayersGuide hands -- [ (Opponent 'A') (MathResult Loss)]
+    hands = splitNewLine conts # map splitWhitespace
+    players = map toPlayersGuide hands
     scores = map (\p -> calcScoreGuideII (fst p) (snd p)) players
-    --scores = map fillYouHand players
     total = sum scores - 6
+
+testI :: Player -> Player -> String -> String -> Effect Unit
+testI opp you title msg = do
+    log $ title
+    log $ msg  <> toStringAs decimal (calcScoreGuide opp you)
+
+testII :: Player -> MatchResult -> String -> String -> Effect Unit
+testII opp mr title msg = do
+    log $ title
+    log $ msg <> toStringAs decimal (calcScoreGuideII opp mr)
 
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
+
     log $ "Part I"
-
-    log $ "Test Case I: Win"
-    let opp = Opponent Rock
-        you = You Paper
-    log $ "Score Expect 8 (2 + 6): Actual " <> toStringAs decimal (calcScoreGuide opp you)
-
-    log $ "Test Case II: Loss"
-    let opp2 = Opponent Paper
-        you2 = You Rock
-    log $ "Score Expect 1 (1 + 0): Actual " <> toStringAs decimal (calcScoreGuide opp2 you2)
-
-    log $ "Test Case III: Draw"
-    let opp3 = Opponent Scissors
-        you3 = You Scissors
-    log $ "Score Expect 6 (3 + 3): Actual " <> toStringAs decimal (calcScoreGuide opp3 you3)
+    testI (Opponent Rock) (You Paper) "Test Case I: Win" "Score Expect 8 (2 + 6): Actual "
+    testI (Opponent Paper) (You Rock) "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
+    testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
 
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
 
     log $ "\nPart II"
-
-    log $ "Test Case I: Draw"
-    let p1 = Opponent Rock
-        mr = Draw
-    log $ "Score Expect 4 (1 + 3): Actual " <> toStringAs decimal (calcScoreGuideII p1 mr)
-
-    log $ "Test Case II: Loss"
-    let p2 = Opponent Paper
-        mr2 = Loss
-    log $ "Score Expect 1 (1 + 0): Actual " <> toStringAs decimal (calcScoreGuideII p2 mr2)
-
-    log $ "Test Case III: Win"
-    let p3 = Opponent Scissors
-        mr3 = Win
-    log $ "Score Expect 7 (1 + 6): Actual " <> toStringAs decimal (calcScoreGuideII p3 mr3)
+    testII (Opponent Rock) Draw "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
+    testII (Opponent Paper) Loss "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
+    testII (Opponent Scissors) Win "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
 
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11763
