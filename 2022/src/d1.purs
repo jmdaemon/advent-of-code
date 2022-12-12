@@ -3,11 +3,12 @@ module D1 where
 import Prelude
 
 import Common (inputPath, intToStr, readToString, splitBlankLine, splitNewLine, strToInt)
-import Data.Array (last, length, sort, splitAt)
+import Data.Array (last, length, sort, splitAt, unsafeIndex)
 import Data.Foldable (sum)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
+import Partial.Unsafe (unsafePartial)
 
 type Calories = Int
 
@@ -19,10 +20,17 @@ calsPerElf :: String -> Array Calories
 calsPerElf conts = splitBlankLine conts # map splitNewLine # map toCalories # map sum
 
 findHighestCalories :: String -> Calories
-findHighestCalories conts = let highest = calsPerElf conts # sort # last in
-    case highest of 
-         Nothing -> 0
-         Just cals -> cals
+findHighestCalories conts = let descending = calsPerElf conts # sort
+                             in unsafePartial $ unsafeIndex descending (length descending)
+
+--findHighestCalories conts = res
+    --where descending = calsPerElf conts # sort
+          --res = unsafePartial $ unsafeIndex descending (length descending)
+
+--findHighestCalories conts = let highest = calsPerElf conts # sort # last in
+    --case highest of 
+         --Nothing -> 0
+         --Just cals -> cals
 
 -- Part II
 findTopThreeCalories :: String -> Calories
