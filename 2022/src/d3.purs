@@ -59,15 +59,8 @@ mkLowerMap = mkCharMap "abcdefghijklmnopqrstuvwxyz" (range 1 26)
 mkUpperMap :: Map Char Int
 mkUpperMap = mkCharMap (toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52) 
 
--- Mappings themselves
-lmap :: Map Char Int
-lmap = mkLowerMap
-
-umap :: Map Char Int
-umap = mkUpperMap
-
 cmap :: Map Char Int
-cmap = union lmap umap
+cmap = union mkLowerMap mkUpperMap
 
 -- TOOD: Find a way to map the characters easily from lowercase 1-26, uppercase 27-52
 -- Idea: Generate the lowercase, uppercase mappings?
@@ -86,6 +79,9 @@ sanitizeIntArray :: Array (Maybe Int) -> Array Int
 sanitizeIntArray iarr = filter (_ /= 0) (map (\x -> case x of
                              Nothing -> 0
                              Just val -> val) iarr)
+
+fromMatchToPriority :: String -> Array Int
+fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray 
 
 --unwrapInt :: Array (Maybe Int) -> NonEmptyArray Int
 --unwrapInt arr = case fromArray arr of
@@ -138,6 +134,6 @@ test = do
 
     --log $ "Priority: " <> intToStr (lookup (findMatching s1 s2) lmap)
     let matching = (findMatching s1 s2)
-    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities matching cmap))))
+    log $ "Priority: " <> (joinWith "" (map intToStr $ fromMatchToPriority matching))
 
-    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities "P" cmap))))
+    log $ "Priority: " <> (joinWith "" (map intToStr $ fromMatchToPriority "P"))
