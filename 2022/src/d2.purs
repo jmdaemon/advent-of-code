@@ -65,12 +65,15 @@ scorePlayer _ _ = 0
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (You $ mkHandYou $ unsafePartial $ unsafeIndex array 1)
 
-findTotalScore :: String -> Int
-findTotalScore conts = total where
+totalScore :: String -> (Array String -> Tuple Player Player) -> Int
+totalScore conts f = total where
     hands = splitNewLine conts # map splitWhitespace
-    players = map toPlayers hands
+    players = map f hands
     scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
+
+findTotalScore :: String -> Int
+findTotalScore conts = totalScore conts toPlayers
 
 -- Part II
 mkMatchResult :: String -> MatchResult
@@ -93,35 +96,19 @@ findHand Rock Win = Paper
 findHand Paper Win = Scissors
 findHand Scissors Win = Rock
 
---toPlayersGuide :: Array String -> Tuple Player MatchResult
---toPlayersGuide array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
---toPlayersGuide :: Array String -> Tuple Player MatchResult
 toPlayersGuide :: Array String -> Tuple Player Player
 toPlayersGuide array = Tuple opp you
     where opp = Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0
           mr = mkMatchResult $ unsafePartial $ unsafeIndex array 1
           you = You ( findHand (getHand opp) mr )
 
---calcScoreGuide :: Player -> MatchResult -> Int
---calcScoreGuide opp mr = scorePlayer opp $ You $ findHand (getHand opp) mr
-
 findTotalScoreGuide :: String -> Int
-findTotalScoreGuide conts = total where
-    hands = splitNewLine conts # map splitWhitespace
-    players = map toPlayersGuide hands
-    scores = map (\p -> scorePlayer (fst p) (snd p)) players
-    --scores = map (\p -> calcScoreGuide (fst p) (snd p)) players
-    total = sum scores
+findTotalScoreGuide conts = totalScore conts toPlayersGuide
 
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
     log $ title
     log $ msg  <> intToStr (scorePlayer opp you)
-
---testII :: Player -> MatchResult -> String -> String -> Effect Unit
---testII opp mr title msg = do
-    --log $ title
-    --log $ msg <> intToStr (calcScoreGuide opp mr)
 
 testII :: Array String -> String -> String -> Effect Unit
 testII guide title msg = do
@@ -137,26 +124,11 @@ test = do
     testI (Opponent Rock) (You Paper) "Test Case I: Win" "Score Expect 8 (2 + 6): Actual "
     testI (Opponent Paper) (You Rock) "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
-
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findTotalScore conts) <> "\n"-- Expect 12645
-
-    --testII "A Y" "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
-    --testII "B X" "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
-    --testII "C Z" "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
-
-    --testII ["A", "B"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
-    --testII ["B", "A"] "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
-    --testII ["C", "A"] "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
 
     testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
     testII ["B", "X"] "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     testII ["C", "Z"] "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
-
-    --testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
-    --testII ["B", "A"] "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
-    --testII ["C", "X"] "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
-
-
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11763
