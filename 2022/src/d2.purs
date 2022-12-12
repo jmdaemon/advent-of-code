@@ -5,7 +5,6 @@ import Prelude
 import Common (inputPath, intToStr, readToString, splitNewLine, splitWhitespace)
 import Data.Array (unsafeIndex)
 import Data.Foldable (sum)
-import Data.Int (decimal, toStringAs)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
@@ -110,12 +109,12 @@ findTotalScoreGuide conts = total where
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
     log $ title
-    log $ msg  <> toStringAs decimal (scorePlayer opp you)
+    log $ msg  <> intToStr (scorePlayer opp you)
 
 testII :: Player -> MatchResult -> String -> String -> Effect Unit
 testII opp mr title msg = do
     log $ title
-    log $ msg <> toStringAs decimal (calcScoreGuide opp mr)
+    log $ msg <> intToStr (calcScoreGuide opp mr)
 
 test :: Effect Unit
 test = do
