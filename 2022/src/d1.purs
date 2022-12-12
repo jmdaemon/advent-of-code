@@ -2,7 +2,7 @@ module D1 where
 
 import Prelude
 
-import Common (readToString, intToStr, strToInt, splitBlankLine, splitNewLine)
+import Common (inputPath, intToStr, readToString, splitBlankLine, splitNewLine, strToInt)
 import Data.Array (last, length, sort, splitAt)
 import Data.Foldable (sum)
 import Data.Maybe (Maybe(..))
@@ -10,9 +10,6 @@ import Effect (Effect)
 import Effect.Console (log)
 
 type Calories = Int
-
-input :: String
-input = "src/input/d1.txt"
 
 -- Part I
 toCalories :: Array String -> Array Calories
@@ -36,10 +33,11 @@ findTopThreeCalories conts = total where
 
 test :: Effect Unit
 test = do
-    let e1 = "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000"
     log $ "Advent of Code Day #1"
+    let e1 = "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000"
     log $ "Test Case"
     log $ "The elf with the highest number of calories carried is: Expect 24000 Actual " <> intToStr (findHighestCalories e1)
     log $ "Input Case"
+    let input = inputPath "d1.txt"
     readToString input >>= \str -> log $ "The highest number of calories is " <> intToStr (findHighestCalories str)
     readToString input >>= \str -> log $ "The sum of the calories of the top three elves is " <> intToStr (findTopThreeCalories str)

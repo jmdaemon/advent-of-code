@@ -2,6 +2,7 @@ module Common where
 -- Common library code for solving puzzles
 
 import Data.String.Pattern
+import Prelude
 
 import Data.Int (decimal, fromString, toStringAs)
 import Data.Maybe (Maybe(..))
@@ -37,3 +38,10 @@ splitWhitespace s = splitStr s " "
 -- Reading Strings
 readToString :: String -> Effect String
 readToString file = readTextFile UTF8 file
+
+-- Input files
+formatPath:: String -> String -> String
+formatPath prefix file = prefix <> "/" <> file
+
+inputPath :: String -> String
+inputPath file = formatPath "src/input" file
