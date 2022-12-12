@@ -1,11 +1,22 @@
 module D3 where
 
+import Data.String.CodeUnits
 import Prelude
 
+import Common (intToStr)
 import Control.Monad.ST (foreach)
+import Data.Array (filter, range, zip)
 import Data.Array as DA
+import Data.Array.NonEmpty (NonEmptyArray, fromArray, toNonEmpty)
+import Data.Array.NonEmpty as DANE
+import Data.Char.Utils (toCodePoint)
+import Data.Eq ((/=))
+import Data.Map (Map, lookup)
+import Data.Map as DM
+import Data.Maybe (Maybe(..))
 import Data.Set (Set, fromFoldable, fromMap, insert, intersection, singleton, toUnfoldable)
-import Data.String (length, splitAt)
+import Data.String (CodePoint, codePointFromChar, joinWith, length, splitAt, toUpper)
+import Data.String.CodePoints (toCodePointArray)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Tuple (Tuple(..))
 import Effect (Effect, foreachE)
@@ -24,10 +35,9 @@ type Priority = Int
 -- Sum priorities 
 -- Map across all rucksacks
 
+-- Helper Functions
 halveString :: String -> { after :: String, before :: String }
 halveString s = splitAt (length s / 2) s
-
--- Helper Functions
 
 -- Set Ops
 strToSet :: String -> Set Char
@@ -39,10 +49,52 @@ setToStr set = DA.fromFoldable set # fromCharArray
 findMatching :: String -> String -> String
 findMatching s1 s2 = intersection (strToSet s1) (strToSet s2) # setToStr 
 
+-- Create Mappings
+--mkLowerMap :: Map Char String
+mkCharMap :: String -> Array Int -> Map Char Int
+mkCharMap charset num_range = DM.fromFoldable $ zip (toCharArray charset) num_range
+
+mkLowerMap :: Map Char Int
+--mkLowerMap = DM.fromFoldable $ zip (toCharArray "abcdefghijklmnopqrstuvwxyz") (range 1 26) 
+mkLowerMap = mkCharMap "abcdefghijklmnopqrstuvwxyz" (range 1 26)
+
+mkUpperMap :: Map Char Int
+--mkUpperMap = DM.fromFoldable $ zip (toCharArray "abcdefghijklmnopqrstuvwxyz") (range 1 26) 
+mkUpperMap = mkCharMap (toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52) 
+
 -- TOOD: Find a way to map the characters easily from lowercase 1-26, uppercase 27-52
 -- Idea: Generate the lowercase, uppercase mappings?
 toPriority :: Char -> Int
 toPriority char = 0
+
+--toPriorities :: String -> Array CodePoint
+--toPriorities :: String -> Array Int
+--toPriorities :: String -> Int
+--toPriorities s = toCodePoint s
+
+toPriorities :: String -> Map Char Int -> Array (Maybe Int)
+toPriorities s cmap = map (\x -> lookup x cmap) (toCharArray s)
+
+sanitizeIntArray :: Array (Maybe Int) -> Array Int
+sanitizeIntArray iarr = filter (_ /= 0) (map (\x -> case x of
+                             Nothing -> 0
+                             Just val -> val) iarr)
+
+--unwrapInt :: Array (Maybe Int) -> NonEmptyArray Int
+--unwrapInt arr = case fromArray arr of
+    --Nothing -> DANE.singleton 0
+    --Just array -> array
+
+unwrapInt :: Array Int -> NonEmptyArray Int
+unwrapInt arr = case fromArray arr of
+    Nothing -> DANE.singleton 0
+    Just array -> array
+
+--toPriorities s = map toCodePoint $ map codePointFromChar (toCharArray s)
+
+--toPriorities s = map codePointToInt (map codePointFromChar (toCharArray s))
+--toPriorities s = map toCodePoint (toCodePointArray s)
+--toPriorities s = map toCodePoint (map codePointFromChar (toCharArray s))
 
 -- TODO: Map toPriority over every character and return
 sumPriorities :: String -> Int 
@@ -70,3 +122,14 @@ test = do
         s2 = str.after
     log $ "String Before: " <> s1 <> " String After: " <> s2
     log $ "Matching Items: " <> (findMatching s1 s2)
+    --log $ "Code Points: " <> intToStr ( codePointToInt (toPriorities (findMatching s1 s2)))
+    --log $ "Code Points: " <> intToStr toPriorities (findMatching s1 s2)
+    --log $ "Code Points: " <> show 
+
+    --log $ "Code Points: " <> intToStr (toPriorities (findMatching s1 s2) - 96)
+    --log $ "Code Points: " <> intToStr (toPriorities ("P"))
+    let lmap = mkLowerMap
+        umap = mkUpperMap
+    --log $ "Priority: " <> intToStr (lookup (findMatching s1 s2) lmap)
+    let matching = (findMatching s1 s2)
+    log $ "Priority: " <> (joinWith "" (map intToStr (sanitizeIntArray (toPriorities matching lmap))))

@@ -19,6 +19,7 @@ You can edit this file as you like.
   , "prelude"
   , "st"
   , "strings"
+  , "stringutils"
   , "test-unit"
   , "tuples"
   ]
