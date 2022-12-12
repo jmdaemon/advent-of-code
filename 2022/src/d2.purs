@@ -58,10 +58,10 @@ playMatch _ _ = Win
 score :: Hand -> Hand -> Int
 score h1 h2 = (scoreHand h1) + (scoreMatch $ playMatch h1 h2)
 
-calcScorePlayer :: Player -> Player -> Int
-calcScorePlayer (Opponent opp) (You you) = score you opp -- Your score
-calcScorePlayer (You you) (Opponent opp) = score opp you -- Your opponent's score
-calcScorePlayer _ _ = 0
+scorePlayer :: Player -> Player -> Int
+scorePlayer (Opponent opp) (You you) = score you opp -- Your score
+scorePlayer (You you) (Opponent opp) = score opp you -- Your opponent's score
+scorePlayer _ _ = 0
 
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (You $ mkHandYou $ unsafePartial $ unsafeIndex array 1)
@@ -70,7 +70,7 @@ findTotalScore :: String -> Int
 findTotalScore conts = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map toPlayers hands
-    scores = map (\p -> calcScorePlayer (fst p) (snd p)) players
+    scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
 
 -- Part II
@@ -98,7 +98,7 @@ toPlayersGuide :: Array String -> Tuple Player MatchResult
 toPlayersGuide array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (mkMatchResult $ unsafePartial $ unsafeIndex array 1)
 
 calcScoreGuide :: Player -> MatchResult -> Int
-calcScoreGuide opp mr = calcScorePlayer opp $ You $ findHand (getHand opp) mr
+calcScoreGuide opp mr = scorePlayer opp $ You $ findHand (getHand opp) mr
 
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = total where
@@ -110,7 +110,7 @@ findTotalScoreGuide conts = total where
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
     log $ title
-    log $ msg  <> toStringAs decimal (calcScorePlayer opp you)
+    log $ msg  <> toStringAs decimal (scorePlayer opp you)
 
 testII :: Player -> MatchResult -> String -> String -> Effect Unit
 testII opp mr title msg = do
