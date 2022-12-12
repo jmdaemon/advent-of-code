@@ -2,7 +2,7 @@ module D2 where
 
 import Prelude
 
-import Common (intToStr, readToString, splitNewLine, splitWhitespace)
+import Common (inputPath, intToStr, readToString, splitNewLine, splitWhitespace)
 import Data.Array (unsafeIndex)
 import Data.Foldable (sum)
 import Data.Int (decimal, toStringAs)
@@ -68,9 +68,6 @@ calcScoreGuide (You _) (You _) = 0
 calcScoreGuide (Opponent opp) (You you) = calcScore you opp
 calcScoreGuide (You you) (Opponent opp) = calcScore opp you
 
-input :: String
-input = "src/input/d2.txt"
-
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple (mkOpp $ unsafePartial $ unsafeIndex array 0) (mkYou $ unsafePartial $ unsafeIndex array 1)
 
@@ -79,7 +76,7 @@ findTotalScore conts = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map toPlayers hands
     scores = map (\p -> calcScoreGuide (fst p) (snd p)) players
-    total = sum scores - 6
+    total = sum scores
 
 -- Part II
 mkMatchResult :: String -> MatchResult
@@ -113,7 +110,7 @@ findTotalScoreGuide conts = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map toPlayersGuide hands
     scores = map (\p -> calcScoreGuideII (fst p) (snd p)) players
-    total = sum scores - 6
+    total = sum scores
 
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
@@ -128,19 +125,18 @@ testII opp mr title msg = do
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
+    let input = inputPath "d2.txt"
 
-    log $ "Part I"
     testI (Opponent Rock) (You Paper) "Test Case I: Win" "Score Expect 8 (2 + 6): Actual "
     testI (Opponent Paper) (You Rock) "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
 
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScore conts) -- Expect 12645
+    readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findTotalScore conts) <> "\n"-- Expect 12645
 
-    log $ "\nPart II"
     testII (Opponent Rock) Draw "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
     testII (Opponent Paper) Loss "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     testII (Opponent Scissors) Win "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
 
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11763
+    readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11763
