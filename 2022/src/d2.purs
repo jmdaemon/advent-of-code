@@ -55,12 +55,12 @@ playMatch Scissors Rock = Loss
 
 playMatch _ _ = Win
 
-calcScore :: Hand -> Hand -> Int
-calcScore h1 h2 = (scoreHand h1) + (scoreMatch $ playMatch h1 h2)
+score :: Hand -> Hand -> Int
+score h1 h2 = (scoreHand h1) + (scoreMatch $ playMatch h1 h2)
 
 calcScorePlayer :: Player -> Player -> Int
-calcScorePlayer (Opponent opp) (You you) = calcScore you opp -- Your score
-calcScorePlayer (You you) (Opponent opp) = calcScore opp you -- Your opponent's score
+calcScorePlayer (Opponent opp) (You you) = score you opp -- Your score
+calcScorePlayer (You you) (Opponent opp) = score opp you -- Your opponent's score
 calcScorePlayer _ _ = 0
 
 toPlayers :: Array String -> Tuple Player Player
