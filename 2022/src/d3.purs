@@ -1,25 +1,17 @@
 module D3 where
 
-import Data.String.CodeUnits
 import Prelude
 
 import Common (intToStr)
-import Control.Monad.ST (foreach)
 import Data.Array (filter, range, zip)
 import Data.Array as DA
-import Data.Array.NonEmpty (NonEmptyArray, fromArray, toNonEmpty)
-import Data.Array.NonEmpty as DANE
-import Data.Char.Utils (toCodePoint)
-import Data.Eq ((/=))
 import Data.Map (Map, lookup, union)
 import Data.Map as DM
 import Data.Maybe (Maybe(..))
-import Data.Set (Set, fromFoldable, fromMap, insert, intersection, singleton, toUnfoldable)
-import Data.String (CodePoint, codePointFromChar, joinWith, length, splitAt, toUpper)
-import Data.String.CodePoints (toCodePointArray)
+import Data.Set (Set, fromFoldable, intersection)
+import Data.String (joinWith, length, splitAt, toUpper)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
-import Data.Tuple (Tuple(..))
-import Effect (Effect, foreachE)
+import Effect (Effect)
 import Effect.Console (log)
 
 type Rucksack =
@@ -71,11 +63,6 @@ sanitizeIntArray iarr = filter (_ /= 0) (map (\x -> case x of
                              Nothing -> 0
                              Just val -> val) iarr)
 
-toNonEmptyIntArray :: Array Int -> NonEmptyArray Int
-toNonEmptyIntArray arr = case fromArray arr of
-    Nothing -> DANE.singleton 0
-    Just array -> array
-
 fromMatchToPriority :: String -> Array Int
 fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray 
 
@@ -108,15 +95,7 @@ test = do
         s2 = str.after
     log $ "String Before: " <> s1 <> " String After: " <> s2
     log $ "Matching Items: " <> (findMatching s1 s2)
-    --log $ "Code Points: " <> intToStr ( codePointToInt (toPriorities (findMatching s1 s2)))
-    --log $ "Code Points: " <> intToStr toPriorities (findMatching s1 s2)
-    --log $ "Code Points: " <> show 
 
-    --log $ "Code Points: " <> intToStr (toPriorities (findMatching s1 s2) - 96)
-    --log $ "Code Points: " <> intToStr (toPriorities ("P"))
-
-    --log $ "Priority: " <> intToStr (lookup (findMatching s1 s2) lmap)
     let matching = (findMatching s1 s2)
     log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority matching) "")
-
     log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority "P") "")
