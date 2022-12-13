@@ -2,9 +2,10 @@ module D3 where
 
 import Prelude
 
-import Common (intToStr)
+import Common (inputPath, intToStr, readToString, splitNewLine)
 import Data.Array (filter, range, zip)
 import Data.Array as DA
+import Data.Foldable (sum)
 import Data.Map (Map, lookup, union)
 import Data.Map as DM
 import Data.Maybe (Maybe(..))
@@ -69,13 +70,25 @@ fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray
 prioritiesToStr :: Array Int -> String -> String
 prioritiesToStr iarr delim = (map intToStr iarr) # joinWith delim
 
--- TODO: Map toPriority over every character and return
-sumPriorities :: String -> Int 
-sumPriorities common = 0
+sumPriorities :: Array Int -> Int
+sumPriorities common = sum common
 
 -- TODO: Map sumPriorities over every rucksack string11770
-sumRucksacks :: String -> Int
-sumRucksacks rucksack = 0
+--sumRucksacks :: String -> Int
+--sumRucksacks rucksack = 0
+
+sumAllPriorities :: String -> Int
+sumAllPriorities conts = total where
+    lines = splitNewLine conts
+    halves = map halveString lines
+    --matching = map (\half ->
+                 --let matching = findMatching half.before half.after
+                  --in fromMatchToPriority matching) halves
+    --matching = map (\half -> fromMatchToPriority (findMatching half.before half.after)) halves
+    matching = map (\half -> findMatching half.before half.after) halves
+    priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
+    sum_priorities = map sumPriorities priorities
+    total = sum sum_priorities
 
 -- Test Case
 -- vJrwpWtwJgWrhcsFMMfFFhFp
@@ -87,6 +100,7 @@ sumRucksacks rucksack = 0
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #3"
+    let input = inputPath "d3.txt"
 
     log $ "Test Case"
     let r1 = "vJrwpWtwJgWrhcsFMMfFFhFp"
@@ -99,3 +113,6 @@ test = do
     let matching = (findMatching s1 s2)
     log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority matching) "")
     log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority "P") "")
+    
+    log $ "Input Case"
+    readToString input >>= \conts -> log $ "Part I: The sum of shared items in all rucksacks is: " <> intToStr (sumAllPriorities conts) <> "\n"-- Expect 8123
