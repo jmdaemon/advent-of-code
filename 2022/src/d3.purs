@@ -15,19 +15,6 @@ import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Effect (Effect)
 import Effect.Console (log)
 
-type Rucksack =
-    { contents :: String
-    , size :: Int
-    }
-type Priority = Int 
-
--- TODO:
--- Split Rucksack string in half, assign string number and int, and return tuple of Rucksacks
--- Find common types/characters in both strings
--- Convert common characters to Priority types
--- Sum priorities 
--- Map across all rucksacks
-
 -- Helper Functions
 halveString :: String -> { after :: String, before :: String }
 halveString s = splitAt (length s / 2) s
@@ -73,29 +60,14 @@ prioritiesToStr iarr delim = (map intToStr iarr) # joinWith delim
 sumPriorities :: Array Int -> Int
 sumPriorities common = sum common
 
--- TODO: Map sumPriorities over every rucksack string11770
---sumRucksacks :: String -> Int
---sumRucksacks rucksack = 0
-
 sumAllPriorities :: String -> Int
 sumAllPriorities conts = total where
     lines = splitNewLine conts
     halves = map halveString lines
-    --matching = map (\half ->
-                 --let matching = findMatching half.before half.after
-                  --in fromMatchToPriority matching) halves
-    --matching = map (\half -> fromMatchToPriority (findMatching half.before half.after)) halves
     matching = map (\half -> findMatching half.before half.after) halves
     priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
-    sum_priorities = map sumPriorities priorities
-    total = sum sum_priorities
-
--- Test Case
--- vJrwpWtwJgWrhcsFMMfFFhFp
--- vJrwpWtwJgWr, hcsFMMfFFhFp
--- Common type: p
--- Priority { 16, p } or 16
--- Sum: 16 (only 1 ruckack)
+    rucksack = map sumPriorities priorities -- [48, 0, 53]
+    total = sum rucksack
 
 test :: Effect Unit
 test = do
