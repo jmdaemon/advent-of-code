@@ -62,42 +62,25 @@ mkUpperMap = mkCharMap (toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52)
 cmap :: Map Char Int
 cmap = union mkLowerMap mkUpperMap
 
--- TOOD: Find a way to map the characters easily from lowercase 1-26, uppercase 27-52
--- Idea: Generate the lowercase, uppercase mappings?
-toPriority :: Char -> Int
-toPriority char = 0
-
---toPriorities :: String -> Array CodePoint
---toPriorities :: String -> Array Int
---toPriorities :: String -> Int
---toPriorities s = toCodePoint s
-
+-- Priority
 toPriorities :: String -> Map Char Int -> Array (Maybe Int)
-toPriorities s cmap = map (\x -> lookup x cmap) (toCharArray s)
+toPriorities s charmap = map (\x -> lookup x charmap) (toCharArray s)
 
 sanitizeIntArray :: Array (Maybe Int) -> Array Int
 sanitizeIntArray iarr = filter (_ /= 0) (map (\x -> case x of
                              Nothing -> 0
                              Just val -> val) iarr)
 
-fromMatchToPriority :: String -> Array Int
-fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray 
-
---unwrapInt :: Array (Maybe Int) -> NonEmptyArray Int
---unwrapInt arr = case fromArray arr of
-    --Nothing -> DANE.singleton 0
-    --Just array -> array
-
-unwrapInt :: Array Int -> NonEmptyArray Int
-unwrapInt arr = case fromArray arr of
+toNonEmptyIntArray :: Array Int -> NonEmptyArray Int
+toNonEmptyIntArray arr = case fromArray arr of
     Nothing -> DANE.singleton 0
     Just array -> array
 
---toPriorities s = map toCodePoint $ map codePointFromChar (toCharArray s)
+fromMatchToPriority :: String -> Array Int
+fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray 
 
---toPriorities s = map codePointToInt (map codePointFromChar (toCharArray s))
---toPriorities s = map toCodePoint (toCodePointArray s)
---toPriorities s = map toCodePoint (map codePointFromChar (toCharArray s))
+prioritiesToStr :: Array Int -> String -> String
+prioritiesToStr iarr delim = (map intToStr iarr) # joinWith delim
 
 -- TODO: Map toPriority over every character and return
 sumPriorities :: String -> Int 
@@ -134,6 +117,6 @@ test = do
 
     --log $ "Priority: " <> intToStr (lookup (findMatching s1 s2) lmap)
     let matching = (findMatching s1 s2)
-    log $ "Priority: " <> (joinWith "" (map intToStr $ fromMatchToPriority matching))
+    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority matching) "")
 
-    log $ "Priority: " <> (joinWith "" (map intToStr $ fromMatchToPriority "P"))
+    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority "P") "")
