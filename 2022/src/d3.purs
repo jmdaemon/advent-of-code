@@ -70,39 +70,17 @@ group _ Nil = Nil
 group n l
     | n > 0 && (n <= length l) = (take n l) : (group n (drop n l))
     | otherwise = Nil
-  
-splitLines :: String -> Effect Unit
-splitLines conts = do
-    let lines = splitNewLine conts -- ["", "", ""]
-        thirds = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
-        thirdsarr = A.fromFoldable thirds
-        thirds_sublist = map A.fromFoldable thirdsarr
-        -- Hack
-        --sanitized = dropEnd 1 thirds_sublist
-        matching = map (\third ->
-                 let a = unsafeGet third 0
-                     b = unsafeGet third 1
-                     c = unsafeGet third 2
-                  --in a <> " " <> b <> " " <> c) sanitized
-                  in a <> " " <> b <> " " <> c) thirds_sublist
-    log $ show matching
 
--- TODO: The last result is null because its not evenly groupable into thirds
 sumGroupPriorities :: String -> Int
 sumGroupPriorities conts = total where
     lines = splitNewLine conts -- ["", "", ""]
-    thirds = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
-    thirdsarr = A.fromFoldable thirds
-    thirds_sublist = map A.fromFoldable thirdsarr
-
-    --sanitized = dropEnd 1 thirds_sublist
-    --sanitized = filter (\x -> not null x) thirds_sublist
+    thirds_list = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
+    thirds = map A.fromFoldable (A.fromFoldable thirds_list)
     matching = map (\third ->
                  let a = unsafeGet third 0
                      b = unsafeGet third 1
                      c = unsafeGet third 2
-                  --in findMatching3 a b c) sanitized
-                  in findMatching3 a b c) thirds_sublist
+                  in findMatching3 a b c) thirds
     priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
     rucksack = map sumPriorities priorities -- [48, 0, 53]
     total = sum rucksack
@@ -128,5 +106,4 @@ test = do
     readToString input >>= \conts -> log $ "Part I: The sum of all priorities of shared items in all rucksacks is: " <> intToStr (sumAllPriorities conts) <> "\n"-- Expect 8123
 
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Part II: The sum of all priorities of shared items in all groups is: " <> intToStr (sumGroupPriorities conts) <> "\n"-- Expect 8123
-    readToString input >>= \conts -> splitLines conts
+    readToString input >>= \conts -> log $ "Part II: The sum of all priorities of shared items in all groups is: " <> intToStr (sumGroupPriorities conts) -- Expect 8123
