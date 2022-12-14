@@ -15,7 +15,7 @@ import Data.List (List(..), drop, take, (:))
 import Data.Map (Map)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Set (Set)
-import Data.String (split, splitAt)
+import Data.String (split)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.String.Pattern (Pattern(..))
 import Effect (Effect)
@@ -63,7 +63,7 @@ splitHyphen :: String -> Array String
 splitHyphen s = splitStr s "-"
 
 halveString :: String -> { after :: String, before :: String }
-halveString s = splitAt (Str.length s / 2) s
+halveString s = Str.splitAt (Str.length s / 2) s
 
 -- Reading Strings
 readToString :: String -> Effect String
@@ -95,3 +95,7 @@ group _ Nil = Nil
 group n l
     | n > 0 && (n <= L.length l) = (take n l) : (group n (drop n l))
     | otherwise = Nil
+
+-- Returns the n greatest elements in an Array given the array is in ascending order
+findNGreatest :: ∀ a. (Ord a) => Int -> Array a -> Array a
+findNGreatest n ascending = (A.splitAt (A.length ascending - n) ascending).after

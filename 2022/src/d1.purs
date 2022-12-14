@@ -2,10 +2,9 @@ module D1 where
 
 import Prelude
 
-import Common (inputPath, strsToInts, intToStr, readToString, splitBlankLine, splitNewLine)
-import Data.Array (last, length, sort, splitAt)
+import Common (findNGreatest, inputPath, intToStr, readToString, splitBlankLine, splitNewLine, strsToInts)
+import Data.Array (sort)
 import Data.Foldable (sum)
-import Data.Maybe (fromMaybe)
 import Effect (Effect)
 import Effect.Console (log)
 
@@ -16,9 +15,6 @@ calsPerElf conts = splitBlankLine conts # map splitNewLine # map strsToInts # ma
 
 findHighestCalories :: String -> Array Calories
 findHighestCalories conts = calsPerElf conts # sort
-
-findNGreatest :: Int -> Array Int -> Array Int
-findNGreatest n ascending = (splitAt (length ascending - n) ascending).after
 
 findCalories :: ∀ a. (Array Int -> a) -> String -> a
 findCalories fn conts = fn $ findHighestCalories conts
