@@ -6,14 +6,18 @@ import Prelude
 import Data.Array as A
 import Data.Map as M
 import Data.Set as S
+import Data.String as Str
+import Data.List as L
+
 import Data.Array (unsafeIndex, zip)
 import Data.Int (decimal, fromString, toStringAs)
+import Data.List (List(..), drop, take, (:))
 import Data.Map (Map)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Set (Set)
-import Data.String (length, split, splitAt)
-import Data.String.Pattern (Pattern(..))
+import Data.String (split, splitAt)
 import Data.String.CodeUnits (fromCharArray, toCharArray)
+import Data.String.Pattern (Pattern(..))
 import Effect (Effect)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (readTextFile)
@@ -50,7 +54,7 @@ splitWhitespace :: String -> Array String
 splitWhitespace s = splitStr s " "
 
 halveString :: String -> { after :: String, before :: String }
-halveString s = splitAt (length s / 2) s
+halveString s = splitAt (Str.length s / 2) s
 
 -- Reading Strings
 readToString :: String -> Effect String
@@ -73,3 +77,12 @@ lookupDefault default key amap = fromMaybe default $ M.lookup key amap
 
 unsafeGet :: ∀ a. Array a -> Int -> a 
 unsafeGet array index = unsafePartial $ unsafeIndex array index
+
+-- Subdivides a list into a nested list
+-- Note that if the list divides unevenly, the remainder will be dropped
+-- group 3 [1, 2, 3, 4, 5, 6]  -> [[1,2,3], [4,5,6]]
+group :: ∀ a. Int -> List a -> List (List a)
+group _ Nil = Nil
+group n l
+    | n > 0 && (n <= L.length l) = (take n l) : (group n (drop n l))
+    | otherwise = Nil

@@ -2,7 +2,7 @@ module D3 where
 
 import Prelude
 
-import Common (halveString, inputPath, intToStr, mkMap, readToString, setToStr, splitNewLine, strToSet, unsafeGet)
+import Common (halveString, inputPath, intToStr, mkMap, readToString, setToStr, splitNewLine, strToSet, unsafeGet, group)
 import Data.Array (dropEnd, filter, head, index, last, null, range)
 import Data.Array as A
 import Data.Foldable (sum)
@@ -61,15 +61,6 @@ sumAllPriorities conts = total where
 -- Part II
 findMatching3 :: String -> String -> String -> String
 findMatching3 s1 s2 s3 = intersection (strToSet s1) (strToSet s2) # intersection (strToSet s3) # setToStr
-
--- Subdivides a list into a nested list
--- Note that if the list divides unevenly, the remainder will be dropped
--- group 3 [1, 2, 3, 4, 5, 6]  -> [[1,2,3], [4,5,6]]
-group :: ∀ a. Int -> List a -> List (List a)
-group _ Nil = Nil
-group n l
-    | n > 0 && (n <= length l) = (take n l) : (group n (drop n l))
-    | otherwise = Nil
 
 sumGroupPriorities :: String -> Int
 sumGroupPriorities conts = total where
