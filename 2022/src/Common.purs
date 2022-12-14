@@ -1,15 +1,18 @@
 module Common where
 -- Common library code for solving puzzles
 
-import Data.String.Pattern
 import Prelude
 
+import Data.Array (unsafeIndex)
 import Data.Int (decimal, fromString, toStringAs)
-import Data.Maybe (Maybe(..))
+import Data.Map (Map, lookup)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.String.Pattern (Pattern(..))
 import Data.String (split)
 import Effect (Effect)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (readTextFile)
+import Partial.Unsafe (unsafePartial)
 
 -- Conversions
 strToInt :: String -> Int
@@ -45,3 +48,10 @@ formatPath prefix file = prefix <> "/" <> file
 
 inputPath :: String -> String
 inputPath file = formatPath "src/input" file
+
+-- Looks up key and defaults to a value
+lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
+lookupDefault default key amap = fromMaybe default $ lookup key amap
+
+unsafeGet :: ∀ a. Array a -> Int -> a 
+unsafeGet array index = unsafePartial $ unsafeIndex array index

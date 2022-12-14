@@ -2,7 +2,7 @@ module D2 where
 
 import Prelude
 
-import Common (inputPath, intToStr, readToString, splitNewLine, splitWhitespace)
+import Common (inputPath, intToStr, readToString, splitNewLine, splitWhitespace, unsafeGet)
 import Data.Array (unsafeIndex, zip)
 import Data.Foldable (sum)
 import Data.Map (Map, lookup)
@@ -53,10 +53,6 @@ getHand p = case p of
     Opponent h -> h
     NoHand -> None
 
--- Looks up key and defaults to a value
-lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
-lookupDefault default key amap = fromMaybe default $ lookup key amap
-
 -- Opponent's Hand | Your Hand
 playMatch :: Hand -> Hand -> MatchResult
 -- If the opponent chooses rock and you choose rock
@@ -74,12 +70,9 @@ score :: Hand -> Hand -> Int
 score h1 h2 = (scoreHand h2) + (scoreMatch $ (playMatch h1 h2))
 
 scorePlayer :: Player -> Player -> Int
---scorePlayer (You you) (Opponent opp)  = score you opp -- Your opponent's score
+scorePlayer (You you) (Opponent opp)  = score you opp -- Your opponent's score
 scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
-
-lookupHand :: Array String -> Int -> String 
-lookupHand array index = unsafePartial $ unsafeIndex array index
 
 mkYou :: Hand -> Player
 mkYou h = case h of
@@ -94,8 +87,8 @@ mkOpp h = case h of
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple opp you
     where 
-          opp = mkOpp $ getHandOpp $ lookupHand array 0
-          you = mkYou $ getHandYou $ lookupHand array 1
+          opp = mkOpp $ getHandOpp $ unsafeGet array 0
+          you = mkYou $ getHandYou $ unsafeGet array 1
 
 totalScore :: String -> (Array String -> Tuple Player Player) -> Int
 totalScore conts f = total where
@@ -136,7 +129,7 @@ findHand Scissors Win = Rock
 toPlayersGuide :: Array String -> Tuple Player Player
 toPlayersGuide array = Tuple opp you
     where 
-          opp = mkOpp $ getHandOpp $ lookupHand array 0
+          opp = mkOpp $ getHandOpp $ unsafeGet array 0
           mr = mkMatchResult $ unsafePartial $ unsafeIndex array 1
           yourhand = findHand (getHand opp) mr
           you = You yourhand
