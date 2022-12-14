@@ -15,7 +15,7 @@ import Partial.Unsafe (unsafePartial)
 
 data Hand = None | Rock | Paper | Scissors
 data Match = Loss | Draw | Win
-data Player = NoHand | You Hand | Opponent Hand
+data Player = You Hand | Opponent Hand
 
 getHandYou :: String -> Hand
 getHandYou s = case s of
@@ -48,18 +48,11 @@ getHand :: Player -> Hand
 getHand p = case p of
     You h -> h
     Opponent h -> h
-    NoHand -> None
-
---mkMapMoves :: Map (Tuple Hand Hand) Match
---mkMapMoves = mkMap $ zip
-    --[ Tuple Rock Rock, Tuple Paper Paper, Tuple Scissors Scissors
-    --, Tuple Rock Scissors, Tuple Paper Rock, Tuple Scissors Paper
-    --, Tuple Rock Paper, Tuple Paper Rock, Tuple Scissors Paper
-    --]
-    --[Draw, Draw, Draw, Loss, Loss, Loss, Win, Win, Win]
 
 -- Opponent's Hand | Your Hand
 playMatch :: Hand -> Hand -> Match
+playMatch None _ = Loss
+playMatch _ None = Loss
 -- If the opponent chooses rock and you choose rock
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
@@ -75,30 +68,15 @@ score :: Hand -> Hand -> Int
 score h1 h2 = (scoreHand h2) + (scoreMatch $ (playMatch h1 h2))
 
 scorePlayer :: Player -> Player -> Int
-scorePlayer (You you) (Opponent opp)  = score you opp -- Your opponent's score
+scorePlayer (You you) (Opponent opp) = score you opp -- Your opponent's score
 scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
-
---mkPlayer :: Hand -> (Player -> Hand) -> Player
---mkPlayer h p = case h of
-    --None -> NoHand
-    --_ -> p h
-
-mkYou :: Hand -> Player
-mkYou h = case h of
-    None -> NoHand
-    _ -> You h
-
-mkOpp :: Hand -> Player
-mkOpp h = case h of
-    None -> NoHand
-    _ -> Opponent h
 
 toPlayers :: Array String -> Tuple Player Player
 toPlayers array = Tuple opp you
     where 
-          opp = mkOpp $ getHandOpp $ unsafeGet array 0
-          you = mkYou $ getHandYou $ unsafeGet array 1
+          opp = Opponent $ getHandOpp $ unsafeGet array 0
+          you = You $ getHandYou $ unsafeGet array 1
 
 totalScore :: String -> (Array String -> Tuple Player Player) -> Int
 totalScore conts f = total where
@@ -138,10 +116,11 @@ findHand Scissors Win = Rock
 
 toPlayersGuide :: Array String -> Tuple Player Player
 toPlayersGuide array = Tuple opp you
-    where 
-          opp = mkOpp $ getHandOpp $ unsafeGet array 0
+    where
+          opp_hand = getHandOpp $ unsafeGet array 0
+          opp = Opponent opp_hand 
           mr = mkMatch $ unsafePartial $ unsafeIndex array 1
-          yourhand = findHand (getHand opp) mr
+          yourhand = findHand opp_hand mr
           you = You yourhand
 
 findTotalScoreGuide :: String -> Int
