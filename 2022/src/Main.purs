@@ -16,5 +16,5 @@ testAll = do
 main :: Effect Unit
 main = do
     --D1.test
-    --D2.test
-    D3.test
+    D2.test
+    --D3.test

@@ -21,6 +21,7 @@ You can edit this file as you like.
   , "strings"
   , "stringutils"
   , "test-unit"
+  , "transformers"
   , "tuples"
   ]
 , packages = ./packages.dhall
