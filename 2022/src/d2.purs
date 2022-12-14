@@ -7,19 +7,17 @@ import Data.Array (unsafeIndex, zip)
 import Data.Foldable (sum)
 import Data.Map (Map, lookup)
 import Data.Map as M
-import Data.Maybe (fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
 import Partial.Unsafe (unsafePartial)
 
 data Hand = Rock | Paper | Scissors
---data MatchResult = Win | Draw | Loss
 data MatchResult = Loss | Draw | Win
-data Player = You Hand | Opponent Hand
+data Player = NoHand | You Hand | Opponent Hand
 
 mkMap :: ∀ a b. (Ord a) => (Ord b) => Array a -> Array b -> Map a b
---mkCharMap charset num_range = DM.fromFoldable $ zip (toCharArray charset) num_range
 mkMap a b = M.fromFoldable $ zip a b
 
 derive instance eqHand :: Eq Hand
@@ -41,126 +39,94 @@ mkScoreHand = mkMap [Rock, Paper, Scissors] [1, 2, 3]
 mkScoreMatch :: Map MatchResult Int
 mkScoreMatch = mkMap [Loss, Draw, Win] [0, 3, 6]
 
-getHand :: Player -> Hand
-getHand (You h) = h
-getHand (Opponent h) = h
+getHand :: Player -> Maybe Hand
+getHand p = case p of
+    You h -> Just h
+    Opponent h -> Just h
+    NoHand -> Nothing
 
---mkHandYou :: String -> Hand
---mkHandYou s = case s of
-    --"X" -> Rock
-    --"Y" -> Paper
-    --_ -> Scissors
+-- Looks up key and defaults to a value
+lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
+lookupDefault default key amap = fromMaybe default $ lookup key amap
 
---mkHandOpp :: String -> Hand
---mkHandOpp s = case s of
-    --"A" -> Rock
-    --"B" -> Paper
-    --_ -> Scissors
-
---scoreHand :: Hand -> Int
---scoreHand hand_type = case hand_type of
-    --Rock -> 1
-    --Paper -> 2
-    --Scissors -> 3
-
---scoreMatch :: MatchResult -> Int
---scoreMatch match_type = case match_type of
-    --Loss -> 0
-    --Draw -> 3
-    --Win -> 6
-
---lookupUnwrap :: ∀ a b c. Int -> a -> b
---lookupUnwrap :: ∀ a b c. Int -> a -> b
---lookupUnwrap 0 key map
---lookupUnwrap :: ∀ a b c. a -> b -> c -> a
-
---lookupUnwrap :: ∀ a b c. (Ord a) => (Ord b) => a -> b -> Map b a -> a
---lookupUnwrap default key amap = fromMaybe default $ lookup key amap
-
---lookupUnwrap :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
---lookupUnwrap default key amap = fromMaybe default $ lookup key amap
-
-lookupUnwrap :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
-lookupUnwrap default key amap = fromMaybe default $ lookup key amap
-
--- Given any two players these are the outcomes of p1 with respect to p2 
+-- Opponent's Hand | Your Hand
 playMatch :: Hand -> Hand -> MatchResult
+-- If the opponent chooses rock and you choose rock
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
 playMatch Scissors Scissors = Draw
-
---playMatch Rock Paper = Loss
---playMatch Paper Scissors = Loss
---playMatch Scissors Rock = Loss
-
---playMatch Paper Rock = Loss
---playMatch Scissors Paper = Loss
---playMatch Rock Scissors = Loss
-
---playMatch Rock Paper = Win
---playMatch Paper Scissors = Win
---playMatch Scissors Rock = Win
-
--- If the opponent chooses rock, and you choose paper
---playMatch Rock Paper = Loss
---playMatch Paper Scissors = Loss
---playMatch Scissors Paper = Loss
---playMatch Scissors Rock = Loss
-
---playMatch _ _ = Loss
---playMatch Rock Scissors = Loss
---playMatch Paper Rock = Loss
---playMatch Scissors Paper = Loss
-
---playMatch Rock Scissors = Win
---playMatch Paper Rock = Win
---playMatch Scissors Paper = Win
-
---playMatch Rock Paper = Loss
---playMatch Paper Rock = Loss
---playMatch Scissors Paper = Loss
-
--- If the opponent chooses rock, and you choose paper
+-- If the opponent chooses rock, and you choose scissors
 playMatch Rock Scissors = Loss
 playMatch Paper Rock = Loss
 playMatch Scissors Paper = Loss
 
 playMatch _ _ = Win
 
-
 score :: Hand -> Hand -> Int
---score h1 h2 = (scoreHand h1) + (scoreMatch $ playMatch h1 h2)
---score h1 h2 = (lookup h1 mkScoreHand) + (lookup (playMatch h1 h2) mkScoreMatch)
---score h1 h2 = (+) <$> (lookup h1 mkScoreHand) <$> (lookup (playMatch h1 h2) mkScoreMatch)
---score h1 h2 = (fromMaybe 0 $ lookup h1 mkScoreHand) + (fromMaybe 0 $ lookup (playMatch h1 h2) mkScoreMatch)
-
---score h1 h2 = (lookupUnwrap 0 h1 mkScoreHand) + (lookupUnwrap 0 (playMatch h1 h2) mkScoreMatch)
---score h1 h2 = (lookupUnwrap 0 h1 mkScoreHand) + (lookupUnwrap 0 (playMatch h2 h1) mkScoreMatch)
-
---score h1 h2 = (lookupUnwrap 0 h1 mkScoreHand) + (lookupUnwrap 0 (playMatch h1 h2) mkScoreMatch)
-score h1 h2 = (lookupUnwrap 0 h2 mkScoreHand) + (lookupUnwrap 0 (playMatch h1 h2) mkScoreMatch)
+score h1 h2 = (lookupDefault 0 h2 mkScoreHand) + (lookupDefault 0 (playMatch h1 h2) mkScoreMatch)
 
 scorePlayer :: Player -> Player -> Int
-scorePlayer (Opponent opp) (You you) = score you opp -- Your opponent's score
-scorePlayer (You you) (Opponent opp) = score opp you -- Your score
+--scorePlayer (You you) (Opponent opp)  = score you opp -- Your opponent's score
+scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
 
-toPlayers :: Array String -> Tuple Player Player
---toPlayers array = Tuple (Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0) (You $ mkHandYou $ unsafePartial $ unsafeIndex array 1)
---toPlayers array = Tuple (Opponent $ (lookupUnwrap "A" mkHandOpp) $ unsafePartial $ unsafeIndex array 0) (You $ (lookupUnwrap "X" mkHandYou ) $ unsafePartial $ unsafeIndex array 1)
+lookupHand :: Array String -> Int -> String 
+lookupHand array index = unsafePartial $ unsafeIndex array index
 
-    --(Opponent $ (lookupUnwrap Rock (unsafePartial $ unsafeIndex array 0) mkHandOpp))
-    --(You $ (lookupUnwrap Rock (unsafePartial $ unsafeIndex array 1) mkHandYou))
-toPlayers array = Tuple
-    (Opponent $ lookupUnwrap Rock (unsafePartial $ unsafeIndex array 0) mkHandOpp)
-    (You $ lookupUnwrap Rock (unsafePartial $ unsafeIndex array 1) mkHandYou)
+mkYou :: String -> Player
+mkYou handstr = case lookup handstr mkHandYou of
+    Just h -> You h
+    Nothing -> NoHand
+
+mkOpp :: String -> Player
+mkOpp handstr = case lookup handstr mkHandOpp of
+    Just h -> Opponent h
+    Nothing -> NoHand
+
+toPlayers :: Array String -> Tuple Player Player
+toPlayers array = Tuple opp you
+    where 
+          opp = mkOpp $ lookupHand array 0
+          you = mkYou $ lookupHand array 1
+
+--toPlayers :: Array String -> Maybe (Tuple Player Player)
+--toPlayers array = Tuple opp you
+    --where
+          --oppstr = (unsafePartial $ unsafeIndex array 0)
+          --opp = Opponent <$> lookup oppstr mkHandOpp
+
+          --youstr = (unsafePartial $ unsafeIndex array 1)
+          --you = You <$> lookup youstr mkHandYou
+
+          --pure Tuple opp you
+
+--toPlayers array = do 
+    --let
+      --oppstr = (unsafePartial $ unsafeIndex array 0)
+      --opp = Opponent $ lookup oppstr mkHandOpp
+      --youstr = (unsafePartial $ unsafeIndex array 1)
+      --you = You $ lookup youstr mkHandYou
+     --Tuple opp you
+
+--toPlayers array = Tuple opp you
+    --where
+          --oppstr = (unsafePartial $ unsafeIndex array 0)
+          --opp = Opponent $ lookup oppstr mkHandOpp
+          --youstr = (unsafePartial $ unsafeIndex array 1)
+          --you = You $ lookup youstr mkHandYou
+
+--toPlayers array = Tuple
+    --(Opponent $ lookupDefault NoHand (unsafePartial $ unsafeIndex array 0) mkHandOpp)
+    --(You $ lookupDefault NoHand (unsafePartial $ unsafeIndex array 1) mkHandYou)
 
 totalScore :: String -> (Array String -> Tuple Player Player) -> Int
 totalScore conts f = total where
     hands = splitNewLine conts # map splitWhitespace
     players = map f hands
-    --scores = map (\p -> scorePlayer (fst p) (snd p)) players
-    scores = map (\p -> scorePlayer (snd p) (fst p)) players
+    scores = map (\p ->
+               let opp = snd p
+                   you = fst p
+                in scorePlayer you opp) players
     total = sum scores
 
 findTotalScore :: String -> Int
@@ -189,7 +155,7 @@ findHand Scissors Win = Rock
 
 --toPlayersGuide :: Array String -> Tuple Player Player
 --toPlayersGuide array = Tuple opp you
-    --where opp = Opponent $ mkHandOpp $ unsafePartial $ unsafeIndex array 0
+    --where opp = (Opponent $ lookupDefault Rock (unsafePartial $ unsafeIndex array 0) mkHandOpp)
           --mr = mkMatchResult $ unsafePartial $ unsafeIndex array 1
           --you = You $ findHand (getHand opp) mr
 
@@ -199,8 +165,8 @@ findHand Scissors Win = Rock
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
     log $ title
-    log $ msg  <> intToStr (scorePlayer you opp)
-    --log $ msg  <> intToStr (scorePlayer opp you)
+    --log $ msg  <> intToStr (scorePlayer you opp)
+    log $ msg  <> intToStr (scorePlayer opp you)
 
 --testII :: Array String -> String -> String -> Effect Unit
 --testII guide title msg = do
@@ -240,8 +206,25 @@ test = do
     log $ "\nInput Case"
     readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findTotalScore conts) <> "\n"-- Expect 12645
 
+    --log "\nExamples"
     --testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
     --testII ["B", "X"] "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     --testII ["C", "Z"] "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
+
+    --log "\nDraw"
+    --testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
+    --testII ["B", "Y"] "Test Case I: Draw" "Score Expect 5 (2 + 3): Actual "
+    --testII ["C", "Y"] "Test Case I: Draw" "Score Expect 6 (6 + 3): Actual "
+
+    --log "\nLoss"
+    --testII ["A", "X"] "Test Case I: Loss" "Score Expect 3 (3 + 0): Actual "
+    --testII ["B", "X"] "Test Case I: Loss" "Score Expect 1 (1 + 0): Actual "
+    --testII ["C", "X"] "Test Case I: Loss" "Score Expect 2 (2 + 0): Actual "
+
+    --log "\nWin"
+    --testII ["A", "Z"] "Test Case I: Loss" "Score Expect 8 (2 + 6): Actual "
+    --testII ["B", "Z"] "Test Case I: Loss" "Score Expect 9 (3 + 6): Actual "
+    --testII ["C", "Z"] "Test Case I: Loss" "Score Expect 7 (1 + 6): Actual "
+
     log $ "Input Case"
-    --readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11763
+    --readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11760
