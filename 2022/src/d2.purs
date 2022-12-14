@@ -131,12 +131,6 @@ testI opp you title msg = do
     log $ title
     log $ msg  <> intToStr (scorePlayer opp you)
 
-testII :: Array String -> String -> String -> Effect Unit
-testII guide title msg = do
-    log $ title
-    let p = (toPlayersGuide guide)
-    log $ msg <> intToStr (scorePlayer (fst p) (snd p))
-
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
@@ -147,47 +141,8 @@ test = do
     testI (Opponent Paper) (You Rock) "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
     testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
 
-    -- Every test case
-    -- Draw
-    log "\nDraw Test Cases"
-    testI (Opponent Rock) (You Rock) "Rock v Rock: Draw " "Expect 4: Actual "
-    testI (Opponent Paper) (You Paper) "Paper v Paper: Draw " "Expect 5: Actual "
-    testI (Opponent Scissors) (You Scissors) "Scissors v Scissors: Draw " "Expect 6: Actual "
-
-    -- Loss
-    log "\nLoss Test Cases"
-    testI (Opponent Rock) (You Scissors) "Rock v Scissors: Loss" "Expect 3: Actual "
-    testI (Opponent Paper) (You Rock) "Paper v Rock: Loss" "Expect 1: Actual "
-    testI (Opponent Scissors) (You Paper) "Scissors v Paper: Loss" "Expect 2: Actual "
-    
-    -- Win
-    log "\nWin Test Cases"
-    testI (Opponent Rock) (You Paper) "Rock v Paper: Win " "Expect 8: Actual "
-    testI (Opponent Paper) (You Scissors) "Paper v Scissors: Win " "Expect 9: Actual "
-    testI (Opponent Scissors) (You Rock) "Scissors v Rock: Win " "Expect 7: Actual "
-
     log $ "\nInput Case"
     readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findTotalScore conts) <> "\n"-- Expect 12645
-
-    log "\nExamples"
-    testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
-    testII ["B", "X"] "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
-    testII ["C", "Z"] "Test Case III: Win" "Score Expect 7 (1 + 6): Actual "
-
-    log "\nDraw"
-    testII ["A", "Y"] "Test Case I: Draw" "Score Expect 4 (1 + 3): Actual "
-    testII ["B", "Y"] "Test Case I: Draw" "Score Expect 5 (2 + 3): Actual "
-    testII ["C", "Y"] "Test Case I: Draw" "Score Expect 6 (6 + 3): Actual "
-
-    log "\nLoss"
-    testII ["A", "X"] "Test Case I: Loss" "Score Expect 3 (3 + 0): Actual "
-    testII ["B", "X"] "Test Case I: Loss" "Score Expect 1 (1 + 0): Actual "
-    testII ["C", "X"] "Test Case I: Loss" "Score Expect 2 (2 + 0): Actual "
-
-    log "\nWin"
-    testII ["A", "Z"] "Test Case I: Loss" "Score Expect 8 (2 + 6): Actual "
-    testII ["B", "Z"] "Test Case I: Loss" "Score Expect 9 (3 + 6): Actual "
-    testII ["C", "Z"] "Test Case I: Loss" "Score Expect 7 (1 + 6): Actual "
 
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11756
