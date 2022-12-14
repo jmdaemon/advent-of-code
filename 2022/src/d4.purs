@@ -4,7 +4,7 @@ import Prelude
 
 import Common (inputPath, intToStr, readToString, splitComma, splitHyphen, splitNewLine, strToInt, unsafeGet)
 import Data.Array (dropEnd, filter, foldr, range)
-import Data.Set (Set, fromFoldable, subset)
+import Data.Set (Set, fromFoldable, intersection, isEmpty, subset)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
@@ -14,6 +14,13 @@ toSeries beg end = range beg end # fromFoldable
 
 isFullyContained :: Set Int -> Set Int -> Boolean
 isFullyContained s1 s2 = (subset s1 s2) || (subset s2 s1)
+
+isOverlapping :: Set Int -> Set Int -> Boolean
+isOverlapping s1 s2 = res where
+    interset = intersection s1 s2
+    res = not isEmpty interset
+     
+    --s1 s2) || (subset s2 s1)
 
 count :: ∀ a. Array a -> Int
 count arr = foldr (\_ i -> i + 1) 0 arr
@@ -49,9 +56,13 @@ findSetsPred conts pred = end
 findAllSubsets :: String -> Int
 findAllSubsets conts = findSetsPred conts isFullyContained
 
+findAllOverlap :: String -> Int
+findAllOverlap conts = findSetsPred conts isOverlapping
+
 test :: Effect Unit
 test = do
     let input = inputPath "d4.txt"
     log $ "Advent of Code Day #4"
     --readToString input >>= \conts -> testI conts
     readToString input >>= \conts -> log $ "There are " <> intToStr (findAllSubsets conts) <> " subsets"
+    readToString input >>= \conts -> log $ "There are " <> intToStr (findAllOverlap conts) <> " overlapping sets"
