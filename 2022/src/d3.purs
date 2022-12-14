@@ -2,7 +2,7 @@ module D3 where
 
 import Prelude
 
-import Common (inputPath, intToStr, readToString, splitNewLine)
+import Common (inputPath, intToStr, strToSet, setToStr, halveString, mkMap, readToString, splitNewLine)
 import Control.Monad.List.Trans (drop)
 import Data.Array (filter, range, take, unsafeIndex, zip)
 import Data.Array as DA
@@ -20,28 +20,15 @@ import Partial.Unsafe (unsafePartial)
 
 -- Part I
 -- Helper Functions
-halveString :: String -> { after :: String, before :: String }
-halveString s = splitAt (length s / 2) s
-
--- Set Ops
-strToSet :: String -> Set Char
-strToSet s = fromFoldable (toCharArray s)
-
-setToStr :: Set Char -> String
-setToStr set = DA.fromFoldable set # fromCharArray
-
 findMatching :: String -> String -> String
 findMatching s1 s2 = intersection (strToSet s1) (strToSet s2) # setToStr 
 
 -- Helper functions to create mappings
-mkCharMap :: String -> Array Int -> Map Char Int
-mkCharMap charset num_range = DM.fromFoldable $ zip (toCharArray charset) num_range
-
 mkLowerMap :: Map Char Int
-mkLowerMap = mkCharMap "abcdefghijklmnopqrstuvwxyz" (range 1 26)
+mkLowerMap = mkMap (toCharArray "abcdefghijklmnopqrstuvwxyz") (range 1 26)
 
 mkUpperMap :: Map Char Int
-mkUpperMap = mkCharMap (toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52) 
+mkUpperMap = mkMap (toCharArray $ toUpper "abcdefghijklmnopqrstuvwxyz") (range 27 52) 
 
 cmap :: Map Char Int
 cmap = union mkLowerMap mkUpperMap

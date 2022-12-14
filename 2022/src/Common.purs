@@ -3,12 +3,17 @@ module Common where
 
 import Prelude
 
+import Data.Array as A
+import Data.Map as M
+import Data.Set as S
 import Data.Array (unsafeIndex, zip)
 import Data.Int (decimal, fromString, toStringAs)
-import Data.Map (Map, fromFoldable, lookup)
+import Data.Map (Map)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String (split)
+import Data.Set (Set)
+import Data.String (length, split, splitAt)
 import Data.String.Pattern (Pattern(..))
+import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Effect (Effect)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (readTextFile)
@@ -22,8 +27,14 @@ strToInt s = do
          Nothing -> 0
          Just int -> int
 
+strToSet :: String -> Set Char
+strToSet s = S.fromFoldable (toCharArray s)
+
 intToStr :: Int -> String
 intToStr int = toStringAs decimal int
+
+setToStr :: Set Char -> String
+setToStr set = A.fromFoldable set # fromCharArray
 
 -- String Splitting
 splitStr :: String -> String -> Array String
@@ -38,6 +49,9 @@ splitBlankLine s = splitStr s "\n\n"
 splitWhitespace :: String -> Array String
 splitWhitespace s = splitStr s " "
 
+halveString :: String -> { after :: String, before :: String }
+halveString s = splitAt (length s / 2) s
+
 -- Reading Strings
 readToString :: String -> Effect String
 readToString file = readTextFile UTF8 file
@@ -51,11 +65,11 @@ inputPath file = formatPath "src/input" file
 
 -- Maps
 mkMap :: ∀ a b. (Ord a) => (Ord b) => Array a -> Array b -> Map a b
-mkMap a b = fromFoldable $ zip a b
+mkMap a b = M.fromFoldable $ zip a b
 
 -- Looks up key and defaults to a value
 lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
-lookupDefault default key amap = fromMaybe default $ lookup key amap
+lookupDefault default key amap = fromMaybe default $ M.lookup key amap
 
 unsafeGet :: ∀ a. Array a -> Int -> a 
 unsafeGet array index = unsafePartial $ unsafeIndex array index
