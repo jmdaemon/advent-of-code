@@ -17,9 +17,6 @@ data Hand = None | Rock | Paper | Scissors
 data MatchResult = Loss | Draw | Win
 data Player = NoHand | You Hand | Opponent Hand
 
-mkMap :: ∀ a b. (Ord a) => (Ord b) => Array a -> Array b -> Map a b
-mkMap a b = M.fromFoldable $ zip a b
-
 getHandYou :: String -> Hand
 getHandYou s = case s of
     "X" -> Rock
@@ -73,6 +70,11 @@ scorePlayer :: Player -> Player -> Int
 scorePlayer (You you) (Opponent opp)  = score you opp -- Your opponent's score
 scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
+
+--mkPlayer :: Hand -> (Player -> Hand) -> Player
+--mkPlayer h p = case h of
+    --None -> NoHand
+    --_ -> p h
 
 mkYou :: Hand -> Player
 mkYou h = case h of

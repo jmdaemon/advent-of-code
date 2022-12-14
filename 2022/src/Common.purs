@@ -3,12 +3,12 @@ module Common where
 
 import Prelude
 
-import Data.Array (unsafeIndex)
+import Data.Array (unsafeIndex, zip)
 import Data.Int (decimal, fromString, toStringAs)
-import Data.Map (Map, lookup)
+import Data.Map (Map, fromFoldable, lookup)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String.Pattern (Pattern(..))
 import Data.String (split)
+import Data.String.Pattern (Pattern(..))
 import Effect (Effect)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (readTextFile)
@@ -48,6 +48,10 @@ formatPath prefix file = prefix <> "/" <> file
 
 inputPath :: String -> String
 inputPath file = formatPath "src/input" file
+
+-- Maps
+mkMap :: ∀ a b. (Ord a) => (Ord b) => Array a -> Array b -> Map a b
+mkMap a b = fromFoldable $ zip a b
 
 -- Looks up key and defaults to a value
 lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
