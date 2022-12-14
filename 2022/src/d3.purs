@@ -3,11 +3,10 @@ module D3 where
 import Prelude
 
 import Common (halveString, inputPath, intToStr, mkMap, readToString, setToStr, splitNewLine, strToSet, unsafeGet, group)
-import Data.Array (dropEnd, filter, head, index, last, null, range)
+import Data.Array (filter, range)
 import Data.Array as A
 import Data.Foldable (sum)
-import Data.List (List(..), drop, fromFoldable, length, take, (:))
-import Data.List as L
+import Data.List (fromFoldable)
 import Data.Map (Map, lookup, union)
 import Data.Maybe (Maybe(..))
 import Data.Set (intersection)
