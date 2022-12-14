@@ -31,6 +31,9 @@ strToInt s = do
          Nothing -> 0
          Just int -> int
 
+strsToInts :: Array String -> Array Int
+strsToInts = map strToInt
+
 strToSet :: String -> Set Char
 strToSet s = S.fromFoldable (toCharArray s)
 
