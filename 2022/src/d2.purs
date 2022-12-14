@@ -2,7 +2,7 @@ module D2 where
 
 import Prelude
 
-import Common (inputPath, intToStr, readToString, splitNewLine, splitWhitespace, unsafeGet)
+import Common (inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
 import Data.Array (unsafeIndex, zip)
 import Data.Foldable (sum)
 import Data.Map (Map, lookup)
@@ -14,7 +14,7 @@ import Effect.Console (log)
 import Partial.Unsafe (unsafePartial)
 
 data Hand = None | Rock | Paper | Scissors
-data MatchResult = Loss | Draw | Win
+data Match = Loss | Draw | Win
 data Player = NoHand | You Hand | Opponent Hand
 
 getHandYou :: String -> Hand
@@ -38,7 +38,7 @@ scoreHand h = case h of
     Paper -> 2
     Scissors -> 3
 
-scoreMatch :: MatchResult -> Int
+scoreMatch :: Match -> Int
 scoreMatch mr = case mr of
     Loss -> 0
     Draw -> 3
@@ -50,8 +50,16 @@ getHand p = case p of
     Opponent h -> h
     NoHand -> None
 
+--mkMapMoves :: Map (Tuple Hand Hand) Match
+--mkMapMoves = mkMap $ zip
+    --[ Tuple Rock Rock, Tuple Paper Paper, Tuple Scissors Scissors
+    --, Tuple Rock Scissors, Tuple Paper Rock, Tuple Scissors Paper
+    --, Tuple Rock Paper, Tuple Paper Rock, Tuple Scissors Paper
+    --]
+    --[Draw, Draw, Draw, Loss, Loss, Loss, Win, Win, Win]
+
 -- Opponent's Hand | Your Hand
-playMatch :: Hand -> Hand -> MatchResult
+playMatch :: Hand -> Hand -> Match
 -- If the opponent chooses rock and you choose rock
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
@@ -106,13 +114,13 @@ findTotalScore :: String -> Int
 findTotalScore conts = totalScore conts toPlayers
 
 -- Part II
-mkMatchResult :: String -> MatchResult
-mkMatchResult s = case s of
+mkMatch :: String -> Match
+mkMatch s = case s of
     "X" -> Loss
     "Y" -> Draw
     _ -> Win
 
-findHand :: Hand -> MatchResult -> Hand
+findHand :: Hand -> Match -> Hand
 findHand None _ = None
 
 findHand Rock Draw = Rock
@@ -132,7 +140,7 @@ toPlayersGuide :: Array String -> Tuple Player Player
 toPlayersGuide array = Tuple opp you
     where 
           opp = mkOpp $ getHandOpp $ unsafeGet array 0
-          mr = mkMatchResult $ unsafePartial $ unsafeIndex array 1
+          mr = mkMatch $ unsafePartial $ unsafeIndex array 1
           yourhand = findHand (getHand opp) mr
           you = You yourhand
 
