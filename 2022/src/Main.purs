@@ -5,7 +5,8 @@ import Effect (Effect)
 
 --import D1 as D1
 --import D2 as D2
-import D3 as D3
+--import D3 as D3
+import D4 as D4
 
 --testAll :: Effect Unit
 --testAll = do
@@ -17,4 +18,5 @@ main :: Effect Unit
 main = do
     --D1.test
     --D2.test
-    D3.test
+    --D3.test
+    D4.test

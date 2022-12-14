@@ -53,6 +53,12 @@ splitBlankLine s = splitStr s "\n\n"
 splitWhitespace :: String -> Array String
 splitWhitespace s = splitStr s " "
 
+splitComma :: String -> Array String
+splitComma s = splitStr s ","
+
+splitHyphen :: String -> Array String
+splitHyphen s = splitStr s "-"
+
 halveString :: String -> { after :: String, before :: String }
 halveString s = splitAt (Str.length s / 2) s
 
