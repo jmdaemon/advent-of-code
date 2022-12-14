@@ -4,7 +4,8 @@ You can edit this file as you like.
 -}
 { name = "aoc-2022"
 , dependencies =
-  [ "arrays"
+  [ "aff"
+  , "arrays"
   , "console"
   , "effect"
   , "foldable-traversable"
