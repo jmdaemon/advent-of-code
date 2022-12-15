@@ -48,14 +48,36 @@ prioritiesToStr iarr delim = (map intToStr iarr) # joinWith delim
 sumPriorities :: Array Int -> Int
 sumPriorities common = sum common
 
+splitHalve :: String -> Array { before :: String, after :: String }
+splitHalve conts = splitNewLine conts # map halveString
+
+splitGroupThirds :: String -> Array (Array String)
+splitGroupThirds conts = thirds
+    where
+          lines = splitNewLine conts -- ["", "", ""]
+          thirds_list = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
+          thirds = map A.fromFoldable (A.fromFoldable thirds_list)
+
+totalPriorities :: ∀ a. (String -> Array a) -> (a -> String) -> String -> Int
+totalPriorities splitfn matchfn conts = total
+    where
+          parsed = splitfn conts
+          matching = map matchfn parsed
+          priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
+          rucksack = map sumPriorities priorities -- [48, 0, 53]
+          total = sum rucksack
+
 sumAllPriorities :: String -> Int
-sumAllPriorities conts = total where
-    lines = splitNewLine conts
-    halves = map halveString lines
-    matching = map (\half -> findMatching half.before half.after) halves
-    priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
-    rucksack = map sumPriorities priorities -- [48, 0, 53]
-    total = sum rucksack
+sumAllPriorities conts = totalPriorities splitHalve (\half -> findMatching half.before half.after) conts
+
+--sumAllPriorities :: String -> Int
+--sumAllPriorities conts = total where
+    --lines = splitNewLine conts
+    --halves = map halveString lines
+    --matching = map (\half -> findMatching half.before half.after) halves
+    --priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
+    --rucksack = map sumPriorities priorities -- [48, 0, 53]
+    --total = sum rucksack
 
 -- Part II
 findMatching3 :: String -> String -> String -> String
@@ -96,4 +118,4 @@ test = do
     readToString input >>= \conts -> log $ "Part I: The sum of all priorities of shared items in all rucksacks is: " <> intToStr (sumAllPriorities conts) <> "\n"-- Expect 8123
 
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Part II: The sum of all priorities of shared items in all groups is: " <> intToStr (sumGroupPriorities conts) -- Expect 8123
+    readToString input >>= \conts -> log $ "Part II: The sum of all priorities of shared items in all groups is: " <> intToStr (sumGroupPriorities conts) -- Expect 2620
