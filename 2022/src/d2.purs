@@ -39,11 +39,6 @@ scoreMatch mr = case mr of
     Draw -> 3
     Win -> 6
 
-getHand :: Player -> Hand
-getHand p = case p of
-    You h -> h
-    Opponent h -> h
-
 -- Opponent's Hand | Your Hand
 playMatch :: Hand -> Hand -> Match
 playMatch None _ = Loss
