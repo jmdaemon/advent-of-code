@@ -63,14 +63,8 @@ scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
 
 -- Parsing
-oppString :: Array String -> String 
-oppString array = unsafeGet array 0
-
-youString :: Array String -> String 
-youString array = unsafeGet array 1
-
 arrayToTuple :: Array String -> Tuple String String
-arrayToTuple arr = Tuple (oppString arr) (youString arr)
+arrayToTuple array = Tuple (unsafeGet array 0) (unsafeGet array 1)
 
 toPlayers :: Tuple String String -> Tuple Player Player
 toPlayers (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ getHandYou second)
