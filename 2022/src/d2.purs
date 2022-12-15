@@ -5,6 +5,7 @@ import Prelude
 import Common (dropLast, inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
 import Data.Array (dropEnd)
 import Data.Foldable (sum)
+import Data.List (List(..), (:))
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
@@ -12,6 +13,8 @@ import Effect.Console (log)
 data Hand = Rock | Paper | Scissors
 data Match = Loss | Draw | Win
 data Player = You Hand | Opponent Hand
+
+derive instance eqMatch :: Eq Match
 
 getHandYou ::  String -> Hand
 getHandYou s = case s of
@@ -81,18 +84,11 @@ mkMatch s = case s of
     _ -> Win
 
 findHand :: Hand -> Match -> Hand
-findHand Rock Draw = Rock
-findHand Paper Draw = Paper
-findHand Scissors Draw = Scissors
-
--- If the opponent has rock, we want to lose with scissors
-findHand Rock Loss = Scissors
-findHand Paper Loss = Rock
-findHand Scissors Loss = Paper
-
-findHand Rock Win = Paper
-findHand Paper Win = Scissors
-findHand Scissors Win = Rock
+findHand h m = go m (Rock : Paper : Scissors : Nil) where
+    go m Nil = h -- This test case is never executed
+    go m (x : Nil) = x
+    go m (x : xs) = let cm = playMatch h x
+                     in if (cm == m) then x else go m xs
 
 toPlayersGuide :: Tuple String String -> Tuple Player Player
 toPlayersGuide (Tuple first second) = Tuple opp you
