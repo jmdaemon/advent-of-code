@@ -17,25 +17,25 @@ data Player = You Hand | Opponent Hand
 derive instance eqMatch :: Eq Match
 
 getHandYou ::  String -> Hand
-getHandYou s = case s of
+getHandYou = case _ of
     "X" -> Rock
     "Y" -> Paper
     _ -> Scissors
 
 getHandOpp :: String -> Hand
-getHandOpp s = case s of
+getHandOpp = case _ of
     "A" -> Rock
     "B" -> Paper
     _ -> Scissors
 
 scoreHand :: Hand -> Int
-scoreHand h = case h of
+scoreHand = case _ of
     Rock -> 1
     Paper -> 2
     Scissors -> 3
 
 scoreMatch :: Match -> Int
-scoreMatch mr = case mr of
+scoreMatch = case _ of
     Loss -> 0
     Draw -> 3
     Win -> 6
@@ -78,7 +78,7 @@ totalScore conts f = total where
 
 -- Part II
 mkMatch :: String -> Match
-mkMatch s = case s of
+mkMatch = case _ of
     "X" -> Loss
     "Y" -> Draw
     _ -> Win
@@ -87,7 +87,7 @@ findHand :: Hand -> Match -> Hand
 findHand h m = go (Rock : Paper : Scissors : Nil) where
     go Nil = h
     go (x : xs) = let cm = playMatch h x
-                     in if (cm == m) then x else go xs
+                   in if (cm == m) then x else go xs
 
 toPlayersGuide :: Tuple String String -> Tuple Player Player
 toPlayersGuide (Tuple first second) = Tuple opp you
@@ -114,7 +114,7 @@ test = do
     testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
 
     log $ "\nInput Case"
-    readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findPoints toPlayers conts) <> "\n"-- Expect 12645
+    readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findPoints toPlayers conts)       -- Expect 12645
 
-    log $ "Input Case"
+    log $ "\nInput Case"
     readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findPoints toPlayersGuide conts) -- Expect 11756
