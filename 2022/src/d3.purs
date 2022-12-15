@@ -17,7 +17,6 @@ import Effect (Effect)
 import Effect.Console (log)
 
 -- Part I
--- Helper Functions
 findMatching :: String -> String -> String
 findMatching s1 s2 = intersection (strToSet s1) (strToSet s2) # setToStr 
 
@@ -52,8 +51,8 @@ splitHalve conts = splitNewLine conts # map halveString
 splitGroupThirds :: String -> Array (Array String)
 splitGroupThirds conts = thirds
     where
-          lines = splitNewLine conts -- ["", "", ""]
-          thirds_list = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
+          lines = splitNewLine conts                    -- ["", "", ""]
+          thirds_list = group 3 $ fromFoldable lines    -- [["", "", ""], ["","",""]]
           thirds = map A.fromFoldable (A.fromFoldable thirds_list)
 
 totalPriorities :: ∀ a. (String -> Array a) -> (a -> String) -> String -> Int
