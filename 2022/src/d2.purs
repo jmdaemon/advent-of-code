@@ -2,7 +2,7 @@ module D2 where
 
 import Prelude
 
-import Common (inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
+import Common (dropLast, inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
 import Data.Array (dropEnd)
 import Data.Foldable (sum)
 import Data.Tuple (Tuple(..), fst, snd)
@@ -67,9 +67,8 @@ toPlayers (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ getH
 
 totalScore :: String -> (Tuple String String -> Tuple Player Player) -> Int
 totalScore conts f = total where
-    hands = splitNewLine conts # map splitWhitespace
-    sanitized = dropEnd 1 hands
-    pairs = map arrayToTuple sanitized
+    hands = splitNewLine conts # map splitWhitespace # dropLast
+    pairs = map arrayToTuple hands
     players = map f pairs
     scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores

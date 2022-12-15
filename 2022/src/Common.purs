@@ -3,19 +3,18 @@ module Common where
 
 import Prelude
 
+import Data.Array (dropEnd, unsafeIndex, zip)
 import Data.Array as A
-import Data.Map as M
-import Data.Set as S
-import Data.String as Str
-import Data.List as L
-
-import Data.Array (unsafeIndex, zip)
 import Data.Int (decimal, fromString, toStringAs)
 import Data.List (List(..), drop, take, (:))
+import Data.List as L
 import Data.Map (Map)
+import Data.Map as M
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Set (Set)
+import Data.Set as S
 import Data.String (split)
+import Data.String as Str
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.String.Pattern (Pattern(..))
 import Effect (Effect)
@@ -44,6 +43,8 @@ setToStr :: Set Char -> String
 setToStr set = A.fromFoldable set # fromCharArray
 
 -- String Splitting
+
+-- Split a string into an array of strings given a delimeter
 splitStr :: String -> String -> Array String
 splitStr str delim = split (Pattern delim) str
     
@@ -99,3 +100,7 @@ group n l
 -- Returns the n greatest elements in an Array given the array is in ascending order
 findNGreatest :: ∀ a. (Ord a) => Int -> Array a -> Array a
 findNGreatest n ascending = (A.splitAt (A.length ascending - n) ascending).after
+
+-- Sanitizing Lists/Arrays
+dropLast :: ∀ a. Array a -> Array a
+dropLast arr = A.dropEnd 1 arr
