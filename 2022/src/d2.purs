@@ -84,11 +84,10 @@ mkMatch s = case s of
     _ -> Win
 
 findHand :: Hand -> Match -> Hand
-findHand h m = go m (Rock : Paper : Scissors : Nil) where
-    go m Nil = h -- This test case is never executed
-    go m (x : Nil) = x
-    go m (x : xs) = let cm = playMatch h x
-                     in if (cm == m) then x else go m xs
+findHand h m = go (Rock : Paper : Scissors : Nil) where
+    go Nil = h
+    go (x : xs) = let cm = playMatch h x
+                     in if (cm == m) then x else go xs
 
 toPlayersGuide :: Tuple String String -> Tuple Player Player
 toPlayersGuide (Tuple first second) = Tuple opp you
