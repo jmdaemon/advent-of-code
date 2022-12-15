@@ -90,10 +90,7 @@ findHand h m = go (Rock : Paper : Scissors : Nil) where
                    in if (cm == m) then x else go xs
 
 toPlayersGuide :: Tuple String String -> Tuple Player Player
-toPlayersGuide (Tuple first second) = Tuple opp you
-    where opp_hand = getHandOpp first
-          opp = Opponent opp_hand
-          you = You $ findHand opp_hand (mkMatch second)
+toPlayersGuide (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ findHand (getHandOpp first) (mkMatch second))
 
 findPoints :: (Tuple String String -> Tuple Player Player) -> String -> Int
 findPoints fn conts = totalScore conts fn
