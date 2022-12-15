@@ -19,19 +19,10 @@ isOverlapping :: Set Int -> Set Int -> Boolean
 isOverlapping s1 s2 = res where
     interset = intersection s1 s2
     res = not isEmpty interset
-     
-    --s1 s2) || (subset s2 s1)
 
 count :: ∀ a. Array a -> Int
 count arr = foldr (\_ i -> i + 1) 0 arr
     
-testI :: String -> Effect Unit
-testI conts = do
-    let lines = splitNewLine conts
-        num_ranges = map splitComma lines
-        pairs_str = map (\x -> map splitHyphen x) num_ranges 
-    log $ show pairs_str
-
 findSetsPred :: String -> (Set Int -> Set Int -> Boolean) -> Int
 findSetsPred conts pred = end
     where
@@ -49,7 +40,7 @@ findSetsPred conts pred = end
           fully_contained = filter (\x ->
                               let a = unsafeGet x 0
                                   b = unsafeGet x 1
-                               in pred a b) series  -- [ [Set 2..4, Set 6..8], [Set 2..3, Set 4..5] ]
+                               in pred a b) series              -- [ [Set 2..4, Set 6..8], [Set 2..3, Set 4..5] ]
           entries = count fully_contained
           end = entries
 
@@ -63,6 +54,5 @@ test :: Effect Unit
 test = do
     let input = inputPath "d4.txt"
     log $ "Advent of Code Day #4"
-    --readToString input >>= \conts -> testI conts
-    readToString input >>= \conts -> log $ "There are " <> intToStr (findAllSubsets conts) <> " subsets"
-    readToString input >>= \conts -> log $ "There are " <> intToStr (findAllOverlap conts) <> " overlapping sets"
+    readToString input >>= \conts -> log $ "Part I. There are " <> intToStr (findAllSubsets conts) <> " subsets"
+    readToString input >>= \conts -> log $ "Part iI. There are " <> intToStr (findAllOverlap conts) <> " overlapping sets"
