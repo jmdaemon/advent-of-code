@@ -2,8 +2,7 @@ module D2 where
 
 import Prelude
 
-import Common (dropLast, inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
-import Data.Array (dropEnd)
+import Common (dropLast, inputPath, intToStr, readToString, splitNewLine, splitWhitespace, unsafeGet)
 import Data.Foldable (sum)
 import Data.List (List(..), (:))
 import Data.Tuple (Tuple(..), fst, snd)
@@ -76,6 +75,9 @@ totalScore conts f = total where
     scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
 
+findPoints :: (Tuple String String -> Tuple Player Player) -> String -> Int
+findPoints fn conts = totalScore conts fn
+
 -- Part II
 mkMatch :: String -> Match
 mkMatch = case _ of
@@ -92,23 +94,17 @@ findHand h m = go (Rock : Paper : Scissors : Nil) where
 toPlayersGuide :: Tuple String String -> Tuple Player Player
 toPlayersGuide (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ findHand (getHandOpp first) (mkMatch second))
 
-findPoints :: (Tuple String String -> Tuple Player Player) -> String -> Int
-findPoints fn conts = totalScore conts fn
-
-testI :: Player -> Player -> String -> String -> Effect Unit
-testI opp you title msg = do
-    log $ title
-    log $ msg  <> intToStr (scorePlayer opp you)
+testCase :: Hand -> Hand -> String -> String -> Effect Unit
+testCase opp you title msg = do
+    log $ title <> "\n" <> msg  <> intToStr (scorePlayer (Opponent opp) (You you))
 
 test :: Effect Unit
 test = do
     log $ "Advent of Code Day #2"
     let input = inputPath "d2.txt"
-
-    log "Examples"
-    testI (Opponent Rock) (You Paper) "Test Case I: Win" "Score Expect 8 (2 + 6): Actual "
-    testI (Opponent Paper) (You Rock) "Test Case II: Loss" "Score Expect 1 (1 + 0): Actual "
-    testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
+    testCase Rock Paper        "Test Case I: Win"      "Score Expect 8 (2 + 6): Actual "
+    testCase Paper Rock        "Test Case II: Loss"    "Score Expect 1 (1 + 0): Actual "
+    testCase Scissors Scissors "Test Case III: Draw"   "Score Expect 6 (3 + 3): Actual "
 
     log $ "\nInput Case"
     readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findPoints toPlayers conts)       -- Expect 12645
