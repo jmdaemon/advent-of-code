@@ -3,15 +3,10 @@ module D2 where
 import Prelude
 
 import Common (inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
-import Data.Array (unsafeIndex, zip)
 import Data.Foldable (sum)
-import Data.Map (Map, lookup)
-import Data.Map as M
-import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
-import Partial.Unsafe (unsafePartial)
 
 data Hand = None | Rock | Paper | Scissors
 data Match = Loss | Draw | Win
@@ -72,11 +67,20 @@ scorePlayer (You you) (Opponent opp) = score you opp -- Your opponent's score
 scorePlayer (Opponent opp) (You you) = score opp you -- Your score
 scorePlayer _ _ = 0
 
+-- Parsing
+oppString :: Array String -> String 
+oppString array = unsafeGet array 0
+
+youString :: Array String -> String 
+youString array = unsafeGet array 1
+
+--nArraytoNTuple :: Array String 
+arrayToTuple :: Array String -> Tuple String String
+arrayToTuple arr = Tuple (oppString arr) (youString arr)
+
 toPlayers :: Array String -> Tuple Player Player
-toPlayers array = Tuple opp you
-    where 
-          opp = Opponent $ getHandOpp $ unsafeGet array 0
-          you = You $ getHandYou $ unsafeGet array 1
+toPlayers array = let parsed = arrayToTuple array
+                   in Tuple (Opponent $ getHandOpp $ fst parsed) (You $ getHandYou $ snd parsed)
 
 totalScore :: String -> (Array String -> Tuple Player Player) -> Int
 totalScore conts f = total where
@@ -116,12 +120,11 @@ findHand Scissors Win = Rock
 
 toPlayersGuide :: Array String -> Tuple Player Player
 toPlayersGuide array = Tuple opp you
-    where
-          opp_hand = getHandOpp $ unsafeGet array 0
-          opp = Opponent opp_hand 
-          mr = mkMatch $ unsafePartial $ unsafeIndex array 1
-          yourhand = findHand opp_hand mr
-          you = You yourhand
+    where parsed = arrayToTuple array
+          opp_hand = getHandOpp (fst parsed)
+          opp = Opponent opp_hand
+          mr = mkMatch (snd parsed)
+          you = You $ findHand opp_hand mr
 
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = totalScore conts toPlayersGuide
