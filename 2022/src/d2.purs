@@ -69,22 +69,18 @@ oppString array = unsafeGet array 0
 youString :: Array String -> String 
 youString array = unsafeGet array 1
 
---nArraytoNTuple :: Array String 
 arrayToTuple :: Array String -> Tuple String String
 arrayToTuple arr = Tuple (oppString arr) (youString arr)
 
-toPlayers :: Array String -> Tuple Player Player
-toPlayers array = let parsed = arrayToTuple array
-                   in Tuple (Opponent $ getHandOpp $ fst parsed) (You $ getHandYou $ snd parsed)
+toPlayers :: Tuple String String -> Tuple Player Player
+toPlayers (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ getHandYou second)
 
-totalScore :: String -> (Array String -> Tuple Player Player) -> Int
+totalScore :: String -> (Tuple String String -> Tuple Player Player) -> Int
 totalScore conts f = total where
     hands = splitNewLine conts # map splitWhitespace
-    players = map f hands
-    scores = map (\p ->
-               let opp = snd p
-                   you = fst p
-                in scorePlayer you opp) players
+    pairs = map arrayToTuple hands
+    players = map f pairs
+    scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
 
 findTotalScore :: String -> Int
@@ -113,13 +109,11 @@ findHand Rock Win = Paper
 findHand Paper Win = Scissors
 findHand Scissors Win = Rock
 
-toPlayersGuide :: Array String -> Tuple Player Player
-toPlayersGuide array = Tuple opp you
-    where parsed = arrayToTuple array
-          opp_hand = getHandOpp (fst parsed)
+toPlayersGuide :: Tuple String String -> Tuple Player Player
+toPlayersGuide (Tuple first second) = Tuple opp you
+    where opp_hand = getHandOpp first
           opp = Opponent opp_hand
-          mr = mkMatch (snd parsed)
-          you = You $ findHand opp_hand mr
+          you = You $ findHand opp_hand (mkMatch second)
 
 findTotalScoreGuide :: String -> Int
 findTotalScoreGuide conts = totalScore conts toPlayersGuide
