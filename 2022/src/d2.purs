@@ -83,9 +83,6 @@ totalScore conts f = total where
     scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
 
-findTotalScore :: String -> Int
-findTotalScore conts = totalScore conts toPlayers
-
 -- Part II
 mkMatch :: String -> Match
 mkMatch s = case s of
@@ -115,8 +112,8 @@ toPlayersGuide (Tuple first second) = Tuple opp you
           opp = Opponent opp_hand
           you = You $ findHand opp_hand (mkMatch second)
 
-findTotalScoreGuide :: String -> Int
-findTotalScoreGuide conts = totalScore conts toPlayersGuide
+findPoints :: (Tuple String String -> Tuple Player Player) -> String -> Int
+findPoints fn conts = totalScore conts fn
 
 testI :: Player -> Player -> String -> String -> Effect Unit
 testI opp you title msg = do
@@ -134,7 +131,7 @@ test = do
     testI (Opponent Scissors) (You Scissors) "Test Case III: Draw" "Score Expect 6 (3 + 3): Actual "
 
     log $ "\nInput Case"
-    readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findTotalScore conts) <> "\n"-- Expect 12645
+    readToString input >>= \conts -> log $ "Part I: Total number of points is: " <> intToStr (findPoints toPlayers conts) <> "\n"-- Expect 12645
 
     log $ "Input Case"
-    readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findTotalScoreGuide conts) -- Expect 11756
+    readToString input >>= \conts -> log $ "Part II: Total number of points is: " <> intToStr (findPoints toPlayersGuide conts) -- Expect 11756
