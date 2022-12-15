@@ -12,6 +12,7 @@ import Data.Maybe (Maybe(..))
 import Data.Set (intersection)
 import Data.String (joinWith, toUpper)
 import Data.String.CodeUnits (toCharArray)
+import Data.Tuple.Nested (Tuple3, tuple3, uncurry3)
 import Effect (Effect)
 import Effect.Console (log)
 
@@ -42,11 +43,8 @@ sanitizeIntArray iarr = filter (_ /= 0) (map (\x -> case x of
 fromMatchToPriority :: String -> Array Int
 fromMatchToPriority m = toPriorities m cmap # sanitizeIntArray 
 
-prioritiesToStr :: Array Int -> String -> String
-prioritiesToStr iarr delim = (map intToStr iarr) # joinWith delim
-
-sumPriorities :: Array Int -> Int
-sumPriorities common = sum common
+prioritiesToStr :: Array Int -> String
+prioritiesToStr iarr = (map intToStr iarr) # joinWith ""
 
 splitHalve :: String -> Array { before :: String, after :: String }
 splitHalve conts = splitNewLine conts # map halveString
@@ -64,38 +62,21 @@ totalPriorities splitfn matchfn conts = total
           parsed = splitfn conts
           matching = map matchfn parsed
           priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
-          rucksack = map sumPriorities priorities -- [48, 0, 53]
+          rucksack = map (\ps -> sum ps) priorities       -- [48, 0, 53]
           total = sum rucksack
 
 sumAllPriorities :: String -> Int
 sumAllPriorities conts = totalPriorities splitHalve (\half -> findMatching half.before half.after) conts
 
---sumAllPriorities :: String -> Int
---sumAllPriorities conts = total where
-    --lines = splitNewLine conts
-    --halves = map halveString lines
-    --matching = map (\half -> findMatching half.before half.after) halves
-    --priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
-    --rucksack = map sumPriorities priorities -- [48, 0, 53]
-    --total = sum rucksack
-
 -- Part II
 findMatching3 :: String -> String -> String -> String
 findMatching3 s1 s2 s3 = intersection (strToSet s1) (strToSet s2) # intersection (strToSet s3) # setToStr
 
+arrayToTuple :: Array String -> Tuple3 String String String
+arrayToTuple third = tuple3 (unsafeGet third 0) (unsafeGet third 1) (unsafeGet third 2)
+
 sumGroupPriorities :: String -> Int
-sumGroupPriorities conts = total where
-    lines = splitNewLine conts -- ["", "", ""]
-    thirds_list = group 3 $ fromFoldable lines -- [["", "", ""], ["","",""]]
-    thirds = map A.fromFoldable (A.fromFoldable thirds_list)
-    matching = map (\third ->
-                 let a = unsafeGet third 0
-                     b = unsafeGet third 1
-                     c = unsafeGet third 2
-                  in findMatching3 a b c) thirds
-    priorities = map fromMatchToPriority matching -- [ [16, 32, ...]]
-    rucksack = map sumPriorities priorities -- [48, 0, 53]
-    total = sum rucksack
+sumGroupPriorities conts = totalPriorities splitGroupThirds (\third -> uncurry3 findMatching3 $ arrayToTuple third) conts
 
 test :: Effect Unit
 test = do
@@ -111,8 +92,8 @@ test = do
     log $ "Matching Items: " <> (findMatching s1 s2)
 
     let matching = (findMatching s1 s2)
-    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority matching) "")
-    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority "P") "")
+    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority matching))
+    log $ "Priority: " <> (prioritiesToStr (fromMatchToPriority "P"))
     
     log $ "Input Case"
     readToString input >>= \conts -> log $ "Part I: The sum of all priorities of shared items in all rucksacks is: " <> intToStr (sumAllPriorities conts) <> "\n"-- Expect 8123
