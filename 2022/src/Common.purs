@@ -42,7 +42,16 @@ intToStr int = toStringAs decimal int
 setToStr :: Set Char -> String
 setToStr set = A.fromFoldable set # fromCharArray
 
--- String Splitting
+-- Sets
+isFullyContained :: ∀ a. Ord a => Set a -> Set a -> Boolean
+isFullyContained s1 s2 = (S.subset s1 s2) || (S.subset s2 s1)
+
+isOverlapping :: ∀ a. Ord a => Set a -> Set a -> Boolean
+isOverlapping s1 s2 = res where
+    interset = S.intersection s1 s2
+    res = not S.isEmpty interset
+
+-- Strings
 
 -- Split a string into an array of strings given a delimeter
 splitStr :: String -> String -> Array String
@@ -66,7 +75,6 @@ splitHyphen s = splitStr s "-"
 halveString :: String -> { after :: String, before :: String }
 halveString s = Str.splitAt (Str.length s / 2) s
 
--- Reading Strings
 readToString :: String -> Effect String
 readToString file = readTextFile UTF8 file
 
@@ -85,9 +93,6 @@ mkMap a b = M.fromFoldable $ zip a b
 lookupDefault :: ∀ a b. (Ord a) => (Ord b) => a -> b -> Map b a -> a
 lookupDefault default key amap = fromMaybe default $ M.lookup key amap
 
-unsafeGet :: ∀ a. Array a -> Int -> a 
-unsafeGet array index = unsafePartial $ unsafeIndex array index
-
 -- Subdivides a list into a nested list
 -- Note that if the list divides unevenly, the remainder will be dropped
 -- group 3 [1, 2, 3, 4, 5, 6]  -> [[1,2,3], [4,5,6]]
@@ -97,10 +102,16 @@ group n l
     | n > 0 && (n <= L.length l) = (take n l) : (group n (drop n l))
     | otherwise = Nil
 
+-- Arrays
+unsafeGet :: ∀ a. Array a -> Int -> a 
+unsafeGet array index = unsafePartial $ unsafeIndex array index
+
 -- Returns the n greatest elements in an Array given the array is in ascending order
 findNGreatest :: ∀ a. (Ord a) => Int -> Array a -> Array a
 findNGreatest n ascending = (A.splitAt (A.length ascending - n) ascending).after
 
--- Sanitizing Lists/Arrays
 dropLast :: ∀ a. Array a -> Array a
 dropLast arr = A.dropEnd 1 arr
+
+count :: ∀ a. Array a -> Int
+count arr = A.foldr (\_ i -> i + 1) 0 arr

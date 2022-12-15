@@ -2,9 +2,9 @@ module D4 where
 
 import Prelude
 
-import Common (inputPath, intToStr, readToString, splitComma, splitHyphen, splitNewLine, strToInt, unsafeGet)
-import Data.Array (dropEnd, filter, foldr, range)
-import Data.Set (Set, fromFoldable, intersection, isEmpty, subset)
+import Common (inputPath, intToStr, readToString, splitComma, splitHyphen, splitNewLine, strToInt, unsafeGet, count, isFullyContained, isOverlapping)
+import Data.Array (dropEnd, filter, range)
+import Data.Set (Set, fromFoldable)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
@@ -12,17 +12,6 @@ import Effect.Console (log)
 toSeries :: Int -> Int -> Set Int
 toSeries beg end = range beg end # fromFoldable
 
-isFullyContained :: Set Int -> Set Int -> Boolean
-isFullyContained s1 s2 = (subset s1 s2) || (subset s2 s1)
-
-isOverlapping :: Set Int -> Set Int -> Boolean
-isOverlapping s1 s2 = res where
-    interset = intersection s1 s2
-    res = not isEmpty interset
-
-count :: ∀ a. Array a -> Int
-count arr = foldr (\_ i -> i + 1) 0 arr
-    
 findSetsPred :: String -> (Set Int -> Set Int -> Boolean) -> Int
 findSetsPred conts pred = end
     where
