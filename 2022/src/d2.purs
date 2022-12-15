@@ -3,32 +3,30 @@ module D2 where
 import Prelude
 
 import Common (inputPath, intToStr, mkMap, readToString, splitNewLine, splitWhitespace, unsafeGet)
+import Data.Array (dropEnd)
 import Data.Foldable (sum)
 import Data.Tuple (Tuple(..), fst, snd)
 import Effect (Effect)
 import Effect.Console (log)
 
-data Hand = None | Rock | Paper | Scissors
+data Hand = Rock | Paper | Scissors
 data Match = Loss | Draw | Win
 data Player = You Hand | Opponent Hand
 
-getHandYou :: String -> Hand
+getHandYou ::  String -> Hand
 getHandYou s = case s of
     "X" -> Rock
     "Y" -> Paper
-    "Z" -> Scissors
-    _ -> None
+    _ -> Scissors
 
 getHandOpp :: String -> Hand
 getHandOpp s = case s of
     "A" -> Rock
     "B" -> Paper
-    "C" -> Scissors
-    _ -> None
+    _ -> Scissors
 
 scoreHand :: Hand -> Int
 scoreHand h = case h of
-    None -> 0
     Rock -> 1
     Paper -> 2
     Scissors -> 3
@@ -41,8 +39,6 @@ scoreMatch mr = case mr of
 
 -- Opponent's Hand | Your Hand
 playMatch :: Hand -> Hand -> Match
-playMatch None _ = Loss
-playMatch _ None = Loss
 -- If the opponent chooses rock and you choose rock
 playMatch Rock Rock = Draw
 playMatch Paper Paper = Draw
@@ -72,7 +68,8 @@ toPlayers (Tuple first second) = Tuple (Opponent $ getHandOpp first) (You $ getH
 totalScore :: String -> (Tuple String String -> Tuple Player Player) -> Int
 totalScore conts f = total where
     hands = splitNewLine conts # map splitWhitespace
-    pairs = map arrayToTuple hands
+    sanitized = dropEnd 1 hands
+    pairs = map arrayToTuple sanitized
     players = map f pairs
     scores = map (\p -> scorePlayer (fst p) (snd p)) players
     total = sum scores
@@ -85,8 +82,6 @@ mkMatch s = case s of
     _ -> Win
 
 findHand :: Hand -> Match -> Hand
-findHand None _ = None
-
 findHand Rock Draw = Rock
 findHand Paper Draw = Paper
 findHand Scissors Draw = Scissors
